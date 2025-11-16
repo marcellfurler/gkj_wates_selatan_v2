@@ -4,6 +4,7 @@ import { NavbarComponent } from "../../components/NavbarComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
+
 const BaptisAnak = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -25,10 +26,51 @@ const BaptisAnak = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-    const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate("/surat/hasil/baptis-anak", { state: formData });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // 1. Persiapkan Payload untuk Backend
+    const payloadToBackend = {
+        // Kode Tipe Surat harus sesuai dengan primary key di tabel surat_tipe Anda
+        kodeTipeSurat: "BAP_ANAK", 
+        // Judul untuk ditampilkan di daftar riwayat
+        judul_surat: `Permohonan Baptis Anak: ${formData.namaAnak || 'Anonim'}`,
+        // data_input adalah dictionary/JSON yang akan disimpan
+        data_input_json: formData 
     };
+
+    let isSavedSuccessfully = false;
+
+    // 2. Kirim Data ke Backend (Endpoint: POST /api/surat)
+    try {
+        console.log("📤 Mengirim data permohonan ke backend...");
+        const response = await fetch('http://localhost:5000/api/surat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadToBackend)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(`Surat berhasil disimpan. ID Transaksi: ${result.kodeSurat}`);
+            console.log("✅ Transaksi surat berhasil disimpan:", result);
+            isSavedSuccessfully = true;
+        } else {
+            // Menangani error dari controller
+            alert(`Gagal menyimpan surat: ${result.message || 'Terjadi kesalahan pada server.'}`);
+            console.error("Gagal simpan surat:", result);
+        }
+    } catch (error) {
+        alert("Terjadi error jaringan/server saat menyimpan surat. Pastikan server aktif.");
+        console.error("Error jaringan:", error);
+    }
+
+    // 3. Navigasi ke Template Hasil jika penyimpanan berhasil
+    if (isSavedSuccessfully) {
+        navigate("/surat/hasil/baptis-anak", { state: formData });
+    }
+  };
 
   return (
     <div>
@@ -72,8 +114,9 @@ const BaptisAnak = () => {
                     type="text"
                     className="form-control"
                     name="namaAyah"
+                    value={formData.namaAyah}
                     onChange={handleChange}
-                    // required
+                    required
                   />
                 </div>
                 <div className="col-md-6">
@@ -82,8 +125,9 @@ const BaptisAnak = () => {
                     type="text"
                     className="form-control"
                     name="namaIbu"
+                    value={formData.namaIbu}
                     onChange={handleChange}
-                    // required
+                    required
                   />
                 </div>
               </div>
@@ -94,8 +138,9 @@ const BaptisAnak = () => {
                   type="text"
                   className="form-control"
                   name="alamat"
+                  value={formData.alamat}
                   onChange={handleChange}
-                //   required
+                  required
                 />
               </div>
 
@@ -107,8 +152,9 @@ const BaptisAnak = () => {
                     type="text"
                     className="form-control"
                     name="namaAnak"
+                    value={formData.namaAnak}
                     onChange={handleChange}
-                    // required
+                    required
                   />
                 </div>
                 <div className="col-md-6">
@@ -116,8 +162,9 @@ const BaptisAnak = () => {
                   <select
                     name="jenisKelamin"
                     className="form-select"
+                    value={formData.jenisKelamin}
                     onChange={handleChange}
-                    // required
+                    required
                   >
                     <option value="">-- Pilih Jenis Kelamin --</option>
                     <option value="Laki-laki">Laki-laki</option>
@@ -133,8 +180,9 @@ const BaptisAnak = () => {
                     type="text"
                     className="form-control"
                     name="tempatLahir"
+                    value={formData.tempatLahir}
                     onChange={handleChange}
-                    // required
+                    required
                   />
                 </div>
                 <div className="col-md-6">
@@ -143,8 +191,9 @@ const BaptisAnak = () => {
                     type="date"
                     className="form-control"
                     name="tanggalLahir"
+                    value={formData.tanggalLahir}
                     onChange={handleChange}
-                    // required
+                    required
                   />
                 </div>
               </div>
@@ -158,6 +207,7 @@ const BaptisAnak = () => {
                   <input
                     type="text"
                     className="form-control"
+                    value={formData.hariPelayanan}
                     name="hariPelayanan"
                     onChange={handleChange}
                   />
@@ -167,6 +217,7 @@ const BaptisAnak = () => {
                   <input
                     type="date"
                     className="form-control"
+                    value={formData.tanggalPelayanan}
                     name="tanggalPelayanan"
                     onChange={handleChange}
                   />
@@ -177,6 +228,7 @@ const BaptisAnak = () => {
                     type="time"
                     className="form-control"
                     name="waktuPelayanan"
+                    value={formData.waktuPelayanan}
                     onChange={handleChange}
                   />
                 </div>
@@ -186,6 +238,7 @@ const BaptisAnak = () => {
                     type="text"
                     className="form-control"
                     name="tempatPelayanan"
+                    value={formData.tempatPelayanan}                  
                     onChange={handleChange}
                   />
                 </div>

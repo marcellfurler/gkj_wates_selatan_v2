@@ -8,14 +8,14 @@ const SuratTemplateBesukPerjamuan = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
 
-  // Ambil semua data dari state
-  const data = state?.data || {};
-  const daftarHadir = state?.daftarHadir || [];
-  const tidakHadir = state?.tidakHadir || [];
-  const wilayahLain = state?.wilayahLain || [];
-  const tamuGereja = state?.tamuGereja || [];
-  const mengetahui = state?.mengetahui || [];
-  const jumlahKeseluruhan = state?.data?.jumlahKeseluruhan || state?.jumlahKeseluruhan || 0; // ✅ ambil otomatis
+  const data = state || {}; // seluruh payload langsung di sini!
+
+  const daftarHadir = data.daftarHadir || [];
+  const tidakHadir = data.tidakHadir || [];
+  const wilayahLain = data.wilayahLain || [];
+  const tamuGereja = data.tamuGereja || [];
+  const mengetahui = data.mengetahui || [];
+  const jumlahKeseluruhan = data.jumlahKeseluruhan || 0;
 
   // Format tanggal ke bahasa Indonesia
   const formatTanggalIndonesia = (tanggal) => {

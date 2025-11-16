@@ -48,10 +48,51 @@ const Pernikahan = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate("/surat/hasil/nikah", { state: formData });
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // 1. Persiapkan Payload untuk Backend
+    const payloadToBackend = {
+        // Kode Tipe Surat harus sesuai dengan primary key di tabel surat_tipe Anda
+        kodeTipeSurat: "NIKAH", 
+        // Judul untuk ditampilkan di daftar riwayat
+        judul_surat: `Permohonan Pernikahan: ${formData.namaPria || 'Anonim'} dan ${formData.namaWanita || 'Anonim'}`,
+        // data_input adalah dictionary/JSON yang akan disimpan
+        data_input_json: formData 
+    };
+
+    let isSavedSuccessfully = false;
+
+    // 2. Kirim Data ke Backend (Endpoint: POST /api/surat)
+    try {
+        console.log("📤 Mengirim data permohonan ke backend...");
+        const response = await fetch('http://localhost:5000/api/surat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadToBackend)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(`Surat berhasil disimpan. ID Transaksi: ${result.kodeSurat}`);
+            console.log("✅ Transaksi surat berhasil disimpan:", result);
+            isSavedSuccessfully = true;
+        } else {
+            // Menangani error dari controller
+            alert(`Gagal menyimpan surat: ${result.message || 'Terjadi kesalahan pada server.'}`);
+            console.error("Gagal simpan surat:", result);
+        }
+    } catch (error) {
+        alert("Terjadi error jaringan/server saat menyimpan surat. Pastikan server aktif.");
+        console.error("Error jaringan:", error);
+    }
+
+    // 3. Navigasi ke Template Hasil jika penyimpanan berhasil
+    if (isSavedSuccessfully) {
+        navigate("/surat/hasil/nikah", { state: formData });
+    }
+  };
 
   return (
     <div>

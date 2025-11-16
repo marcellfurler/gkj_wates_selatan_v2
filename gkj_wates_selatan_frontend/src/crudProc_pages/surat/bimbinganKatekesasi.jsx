@@ -22,10 +22,51 @@ const BimbinganKatekesasi = () => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate("/surat/hasil/katekisasi", { state: data });
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // 1. Persiapkan Payload untuk Backend
+    const payloadToBackend = {
+        // Kode Tipe Surat harus sesuai dengan primary key di tabel surat_tipe Anda
+        kodeTipeSurat: "KATEKISASI", 
+        // Judul untuk ditampilkan di daftar riwayat
+        judul_surat: `Permohonan Katekisasi: ${formData.nama || 'Anonim'}`,
+        // data_input adalah dictionary/JSON yang akan disimpan
+        data_input_json: formData 
+    };
+
+    let isSavedSuccessfully = false;
+
+    // 2. Kirim Data ke Backend (Endpoint: POST /api/surat)
+    try {
+        console.log("📤 Mengirim data permohonan ke backend...");
+        const response = await fetch('http://localhost:5000/api/surat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadToBackend)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(`Surat berhasil disimpan. ID Transaksi: ${result.kodeSurat}`);
+            console.log("✅ Transaksi surat berhasil disimpan:", result);
+            isSavedSuccessfully = true;
+        } else {
+            // Menangani error dari controller
+            alert(`Gagal menyimpan surat: ${result.message || 'Terjadi kesalahan pada server.'}`);
+            console.error("Gagal simpan surat:", result);
+        }
+    } catch (error) {
+        alert("Terjadi error jaringan/server saat menyimpan surat. Pastikan server aktif.");
+        console.error("Error jaringan:", error);
+    }
+
+    // 3. Navigasi ke Template Hasil jika penyimpanan berhasil
+    if (isSavedSuccessfully) {
+        navigate("/surat/hasil/katekisasi", { state: formData });
+    }
+  };
 
   return (
     <div>
@@ -62,7 +103,7 @@ const BimbinganKatekesasi = () => {
                     type="text"
                     className="form-control"
                     name="nama"
-                    value={data.nama}
+                    value={formData.nama}
                     onChange={handleChange}
                     // required
                   />
@@ -73,7 +114,7 @@ const BimbinganKatekesasi = () => {
                     type="text"
                     className="form-control"
                     name="tempatLahir"
-                    value={data.tempatLahir}
+                    value={formData.tempatLahir}
                     onChange={handleChange}
                     // required
                   />
@@ -84,7 +125,7 @@ const BimbinganKatekesasi = () => {
                     type="date"
                     className="form-control"
                     name="tanggalLahir"
-                    value={data.tanggalLahir}
+                    value={formData.tanggalLahir}
                     onChange={handleChange}
                     // required
                   />
@@ -96,7 +137,7 @@ const BimbinganKatekesasi = () => {
                     type="text"
                     className="form-control"
                     name="alamat"
-                    value={data.alamat}
+                    value={formData.alamat}
                     onChange={handleChange}
                     // required
                   />
@@ -108,7 +149,7 @@ const BimbinganKatekesasi = () => {
                     type="text"
                     className="form-control"
                     name="namaAyah"
-                    value={data.namaAyah}
+                    value={formData.namaAyah}
                     onChange={handleChange}
                     // required
                   />
@@ -119,7 +160,7 @@ const BimbinganKatekesasi = () => {
                     type="text"
                     className="form-control"
                     name="namaIbu"
-                    value={data.namaIbu}
+                    value={formData.namaIbu}
                     onChange={handleChange}
                     // required
                   />
@@ -131,7 +172,7 @@ const BimbinganKatekesasi = () => {
                     type="date"
                     className="form-control"
                     name="tanggalBaptis"
-                    value={data.tanggalBaptis}
+                    value={formData.tanggalBaptis}
                     onChange={handleChange}
                     // required
                   />
@@ -142,7 +183,7 @@ const BimbinganKatekesasi = () => {
                     type="text"
                     className="form-control"
                     name="tempatBaptis"
-                    value={data.tempatBaptis}
+                    value={formData.tempatBaptis}
                     onChange={handleChange}
                     // required
                   />
@@ -159,7 +200,7 @@ const BimbinganKatekesasi = () => {
                     type="text"
                     className="form-control"
                     name="hariBimbingan"
-                    value={data.hariBimbingan}
+                    value={formData.hariBimbingan}
                     onChange={handleChange}
                     // required
                   />
@@ -170,7 +211,7 @@ const BimbinganKatekesasi = () => {
                     type="time"
                     className="form-control"
                     name="waktuBimbingan"
-                    value={data.waktuBimbingan}
+                    value={formData.waktuBimbingan}
                     onChange={handleChange}
                     // required
                   />
@@ -181,7 +222,7 @@ const BimbinganKatekesasi = () => {
                     type="text"
                     className="form-control"
                     name="tempatBimbingan"
-                    value={data.tempatBimbingan}
+                    value={formData.tempatBimbingan}
                     onChange={handleChange}
                     // required
                   />

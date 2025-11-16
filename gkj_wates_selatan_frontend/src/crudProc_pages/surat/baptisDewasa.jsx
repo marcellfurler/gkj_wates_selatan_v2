@@ -15,6 +15,7 @@ const BaptisDewasa = () => {
     namaIbu: "",
     namaPasangan: "",
     tempatNikah: "",
+    tanggalNikah: "",
     hariPelayanan: "",
     tanggalPelayanan: "",
     waktuPelayanan: "",
@@ -27,10 +28,51 @@ const BaptisDewasa = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate("/surat/hasil/baptis-dewasa", { state: formData });
-  };
+    const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // 1. Persiapkan Payload untuk Backend
+    const payloadToBackend = {
+        // Kode Tipe Surat harus sesuai dengan primary key di tabel surat_tipe Anda
+        kodeTipeSurat: "BAP_DEWASA", 
+        // Judul untuk ditampilkan di daftar riwayat
+        judul_surat: `Permohonan Baptis Dewasa: ${formData.nama || 'Anonim'}`,
+        // data_input adalah dictionary/JSON yang akan disimpan
+        data_input_json: formData 
+    };
+
+    let isSavedSuccessfully = false;
+
+    // 2. Kirim Data ke Backend (Endpoint: POST /api/surat)
+    try {
+        console.log("📤 Mengirim data permohonan ke backend...");
+        const response = await fetch('http://localhost:5000/api/surat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadToBackend)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(`Surat berhasil disimpan. ID Transaksi: ${result.kodeSurat}`);
+            console.log("✅ Transaksi surat berhasil disimpan:", result);
+            isSavedSuccessfully = true;
+        } else {
+            // Menangani error dari controller
+            alert(`Gagal menyimpan surat: ${result.message || 'Terjadi kesalahan pada server.'}`);
+            console.error("Gagal simpan surat:", result);
+        }
+    } catch (error) {
+        alert("Terjadi error jaringan/server saat menyimpan surat. Pastikan server aktif.");
+        console.error("Error jaringan:", error);
+    }
+
+    // 3. Navigasi ke Template Hasil jika penyimpanan berhasil
+    if (isSavedSuccessfully) {
+        navigate("/surat/hasil/baptis-dewasa", { state: formData });
+    }
+  };
 
   return (
     <div>
@@ -66,6 +108,7 @@ const BaptisDewasa = () => {
                     type="text"
                     className="form-control"
                     name="nama"
+                    value={formData.nama}
                     onChange={handleChange}
                   />
                 </div>
@@ -75,6 +118,7 @@ const BaptisDewasa = () => {
                     type="text"
                     className="form-control"
                     name="tempatLahir"
+                    value={formData.tempatLahir}
                     onChange={handleChange}
                   />
                 </div>
@@ -84,6 +128,7 @@ const BaptisDewasa = () => {
                     type="date"
                     className="form-control"
                     name="tanggalLahir"
+                    value={formData.tanggalLahir}
                     onChange={handleChange}
                   />
                 </div>
@@ -95,6 +140,7 @@ const BaptisDewasa = () => {
                   type="text"
                   className="form-control"
                   name="alamat"
+                  value={formData.alamat}
                   onChange={handleChange}
                 />
               </div>
@@ -108,6 +154,7 @@ const BaptisDewasa = () => {
                     type="text"
                     className="form-control"
                     name="namaAyah"
+                    value={formData.namaAyah}
                     onChange={handleChange}
                   />
                 </div>
@@ -117,6 +164,7 @@ const BaptisDewasa = () => {
                     type="text"
                     className="form-control"
                     name="namaIbu"
+                    value={formData.namaIbu}
                     onChange={handleChange}
                   />
                 </div>
@@ -131,6 +179,7 @@ const BaptisDewasa = () => {
                     type="text"
                     className="form-control"
                     name="namaPasangan"
+                    value={formData.namaPasangan}
                     onChange={handleChange}
                   />
                 </div>
@@ -140,6 +189,7 @@ const BaptisDewasa = () => {
                     type="text"
                     className="form-control"
                     name="tempatNikah"
+                    value={formData.tempatNikah}
                     onChange={handleChange}
                   />
                 </div>
@@ -149,6 +199,7 @@ const BaptisDewasa = () => {
                     type="date"
                     className="form-control"
                     name="tanggalNikah"
+                    value={formData.tanggalNikah}
                     onChange={handleChange}
                   />
                 </div>
@@ -164,6 +215,7 @@ const BaptisDewasa = () => {
                     type="text"
                     className="form-control"
                     name="hariPelayanan"
+                    value={formData.hariPelayanan}
                     onChange={handleChange}
                   />
                 </div>
@@ -173,6 +225,7 @@ const BaptisDewasa = () => {
                     type="date"
                     className="form-control"
                     name="tanggalPelayanan"
+                    value={formData.tanggalPelayanan}
                     onChange={handleChange}
                   />
                 </div>
@@ -182,6 +235,7 @@ const BaptisDewasa = () => {
                     type="time"
                     className="form-control"
                     name="waktuPelayanan"
+                    value={formData.waktuPelayanan}
                     onChange={handleChange}
                   />
                 </div>
@@ -193,6 +247,7 @@ const BaptisDewasa = () => {
                   type="text"
                   className="form-control"
                   name="tempatPelayanan"
+                  value={formData.tempatPelayanan}
                   onChange={handleChange}
                 />
               </div>
@@ -205,6 +260,7 @@ const BaptisDewasa = () => {
                   type="text"
                   className="form-control"
                   name="pembimbing"
+                  value={formData.pembimbing}
                   onChange={handleChange}
                 />
               </div>

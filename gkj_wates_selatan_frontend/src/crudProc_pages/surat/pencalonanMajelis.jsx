@@ -4,7 +4,7 @@ import { NavbarComponent } from "../../components/NavbarComponent";
 
 const PencalonanMajelis = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState({
+  const [formData, setFormData] = useState({
     hari: "",
     tanggal: "",
     nama: "",
@@ -17,13 +17,54 @@ const PencalonanMajelis = () => {
   });
 
   const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate("/surat/hasil/calon-majelis", { state: data });
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // 1. Persiapkan Payload untuk Backend
+    const payloadToBackend = {
+        // Kode Tipe Surat harus sesuai dengan primary key di tabel surat_tipe Anda
+        kodeTipeSurat: "CALON_MAJELIS", 
+        // Judul untuk ditampilkan di daftar riwayat
+        judul_surat: `Permohonan Pencalonan Majelis: ${formData.tanggal || 'Anonim'}`,
+        // data_input adalah dictionary/JSON yang akan disimpan
+        data_input_json: formData 
+    };
+
+    let isSavedSuccessfully = false;
+
+    // 2. Kirim Data ke Backend (Endpoint: POST /api/surat)
+    try {
+        console.log("📤 Mengirim data permohonan ke backend...");
+        const response = await fetch('http://localhost:5000/api/surat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadToBackend)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(`Surat berhasil disimpan. ID Transaksi: ${result.kodeSurat}`);
+            console.log("✅ Transaksi surat berhasil disimpan:", result);
+            isSavedSuccessfully = true;
+        } else {
+            // Menangani error dari controller
+            alert(`Gagal menyimpan surat: ${result.message || 'Terjadi kesalahan pada server.'}`);
+            console.error("Gagal simpan surat:", result);
+        }
+    } catch (error) {
+        alert("Terjadi error jaringan/server saat menyimpan surat. Pastikan server aktif.");
+        console.error("Error jaringan:", error);
+    }
+
+    // 3. Navigasi ke Template Hasil jika penyimpanan berhasil
+    if (isSavedSuccessfully) {
+        navigate("/surat/hasil/calon-majelis", { state: formData });
+    }
+  };
 
   return (
     <div>
@@ -66,7 +107,7 @@ const PencalonanMajelis = () => {
                     type="text"
                     className="form-control"
                     name="hari"
-                    value={data.hari}
+                    value={formData.hari}
                     onChange={handleChange}
                     // required
                   />
@@ -77,7 +118,7 @@ const PencalonanMajelis = () => {
                     type="date"
                     className="form-control"
                     name="tanggal"
-                    value={data.tanggal}
+                    value={formData.tanggal}
                     onChange={handleChange}
                     // required
                   />
@@ -96,9 +137,9 @@ const PencalonanMajelis = () => {
                     type="text"
                     className="form-control"
                     name="nama"
-                    value={data.nama}
+                    value={formData.nama}
                     onChange={handleChange}
-                    // required
+                    required
                   />
                 </div>
                 <div className="col-md-3">
@@ -107,9 +148,9 @@ const PencalonanMajelis = () => {
                     type="text"
                     className="form-control"
                     name="tempatLahir"
-                    value={data.tempatLahir}
+                    value={formData.tempatLahir}
                     onChange={handleChange}
-                    // required
+                    required
                   />
                 </div>
                 <div className="col-md-3">
@@ -118,7 +159,7 @@ const PencalonanMajelis = () => {
                     type="date"
                     className="form-control"
                     name="tanggalLahir"
-                    value={data.tanggalLahir}
+                    value={formData.tanggalLahir}
                     onChange={handleChange}
                     // required
                   />
@@ -130,7 +171,7 @@ const PencalonanMajelis = () => {
                     className="form-control"
                     name="alamat"
                     rows="2"
-                    value={data.alamat}
+                    value={formData.alamat}
                     onChange={handleChange}
                     // required
                   ></textarea>
@@ -149,7 +190,7 @@ const PencalonanMajelis = () => {
                     type="text"
                     className="form-control"
                     name="namaSuamiIstri"
-                    value={data.namaSuamiIstri}
+                    value={formData.namaSuamiIstri}
                     onChange={handleChange}
                   />
                 </div>
@@ -160,7 +201,7 @@ const PencalonanMajelis = () => {
                     type="text"
                     className="form-control"
                     name="majelisI"
-                    value={data.majelisI}
+                    value={formData.majelisI}
                     onChange={handleChange}
                   />
                 </div>
@@ -171,7 +212,7 @@ const PencalonanMajelis = () => {
                     type="text"
                     className="form-control"
                     name="majelisII"
-                    value={data.majelisII}
+                    value={formData.majelisII}
                     onChange={handleChange}
                   />
                 </div>

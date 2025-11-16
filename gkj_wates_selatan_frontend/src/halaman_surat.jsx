@@ -3,60 +3,124 @@ import { Link, useNavigate } from "react-router-dom";
 import { NavbarComponent } from "./components/NavbarComponent";
 
 /* === Komponen Daftar Surat Jemaat === */
+/* === Komponen Daftar Surat Jemaat (Versi Database) === */
 const DaftarSuratJemaat = () => {
   const [daftarSurat, setDaftarSurat] = useState([]);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("daftarSuratJemaat")) || [];
-    setDaftarSurat(saved);
-  }, []);
+  // Mapping path ke halaman edit (bisa ditambah kapan saja)
+  const tipeToPrintPath = {
+    BAP_ANAK: "baptis-anak",
+    BAP_DEWASA: "baptis-dewasa",
+    TOBAT: "pertobatan",
+    CALON_MAJELIS: "calon-majelis",
+    BESUK_PERJAMUAN: "besuk-perjamuan",
+    KATEKISASI: "katekisasi",
+  };
 
-  // Kelompokkan berdasarkan kategori dan jenis surat
-  const kelompok = daftarSurat.reduce((acc, surat) => {
-    if (!acc[surat.kategori]) acc[surat.kategori] = {};
-    if (!acc[surat.kategori][surat.jenis]) acc[surat.kategori][surat.jenis] = [];
-    acc[surat.kategori][surat.jenis].push(surat);
-    return acc;
-  }, {});
+
+useEffect(() => {
+  fetch("http://localhost:5000/api/surat")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("DATA DARI BACKEND:", data); // <--- CEK
+      setDaftarSurat(data);
+    })
+    .catch((err) => console.error("Gagal load surat:", err));
+}, []);
+
+
+  const handleDelete = async (kodeDataSurat) => {
+    if (!window.confirm("Yakin ingin menghapus surat ini?")) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/surat/${kodeDataSurat}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Gagal menghapus");
+
+      setDaftarSurat((prev) => prev.filter((s) => s.kodeDataSurat !== kodeDataSurat));
+      alert("Surat berhasil dihapus!");
+
+    } catch (err) {
+      console.error(err);
+      alert("Gagal menghapus surat");
+    }
+  };
+
 
   return (
     <div>
-      {Object.entries(kelompok).map(([kategori, jenisList]) => (
-        <div key={kategori} className="mb-4">
-          <h5 className="fw-bold mb-3" style={{ color: "#004d97" }}>
-            {kategori}
-          </h5>
+      <h5 className="fw-bold mb-3" style={{ color: "#004d97" }}>
+        Daftar Surat Jemaat
+      </h5>
 
-          {Object.entries(jenisList).map(([jenis, daftar]) => (
-            <div key={jenis} className="ms-3 mb-3">
-              <h6 className="fw-bold">{jenis}</h6>
-              <ul className="list-group list-group-flush">
-                {daftar.map((surat, index) => (
-                  <li
-                    key={index}
-                    className="list-group-item d-flex justify-content-between align-items-center"
+      <div className="table-responsive">
+        <table className="table table-bordered table-striped align-middle">
+          <thead className="table-light">
+            <tr>
+              <th>No</th>
+              <th>Judul Surat</th>
+              <th>Tanggal Input</th>
+              <th style={{ width: "250px" }}>Aksi</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {daftarSurat.map((s, i) => (
+              <tr key={s.kodeDataSurat}>
+                <td>{i + 1}</td>
+                <td>{s.judul_surat}</td>
+                <td>{s.tanggal_input}</td>
+
+                <td className="d-flex gap-2">
+
+                  {/* EDIT */}
+                  <button
+                    className="btn btn-sm btn-outline-warning"
+                    onClick={() => {
+                      localStorage.setItem("idSuratEdit", s.kodeDataSurat);
+                      navigate(`${tipeToPrintPath[s.kodeTipeSurat]}`);
+                    }}
+
                   >
-                    <div>
-                      <b>{surat.namaPemilik}</b> <br />
-                      <small className="text-muted">
-                        Dibuat pada: {surat.tanggalDibuat}
-                      </small>
-                    </div>
-                    <Link
-                      to={surat.path}
-                      className="btn btn-sm btn-outline-primary"
-                    >
-                      Lihat Surat
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      ))}
+                    Edit
+                  </button>
 
-      {daftarSurat.length === 0 && <p>Belum ada surat yang dibuat.</p>}
+
+
+                  {/* PRINT */}
+                  <button
+                    className="btn btn-sm btn-outline-success"
+                    onClick={() => {
+                      localStorage.setItem("idSuratPrint", s.kodeDataSurat); // ✅ SIMPAN ID KE localStorage
+                      console.log("ID Surat yang akan dicetak:", s.kodeDataSurat); // ✅ TAMPILKAN ID DI CONSOLE
+                      navigate(`/surat/hasil/${tipeToPrintPath[s.kodeTipeSurat]}`); // ✅ NAVIGASI TANPA ID DI URL
+                    }}
+                  >
+                    Print
+                  </button>
+
+
+                  {/* DELETE */}
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => handleDelete(s.kodeDataSurat)}
+                  >
+                    Hapus
+                  </button>
+
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {daftarSurat.length === 0 && (
+        <p className="text-muted mt-3">Belum ada surat yang dibuat.</p>
+      )}
     </div>
   );
 };
