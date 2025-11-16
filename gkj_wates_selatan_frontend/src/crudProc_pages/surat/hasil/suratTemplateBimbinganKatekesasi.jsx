@@ -1,26 +1,86 @@
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react"; // Tambahkan import ini
+import { useLocation, useNavigate } from "react-router-dom"; 
+// Pastikan Hapus: import { useParams } from "react-router-dom"; jika tidak digunakan
 import { NavbarComponent } from "../../../components/NavbarComponent";
-import html2pdf from "html2pdf.js";
-import { printSurat } from "../../../components/printSurat";
 
 const SuratTemplateBimbinganKatekisasi = () => {
-  const { state } = useLocation();
-  const navigate = useNavigate();
-  const data = state || {};
+    // 💡 SEMUA HOOK HARUS DI SINI (TOP LEVEL)
+    const navigate = useNavigate();
+    const location = useLocation(); // ✅ Pindah ke sini!
+    const [data, setData] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
 
-  // ✅ Format tanggal ke bahasa Indonesia
-  const formatTanggalIndonesia = (tanggal) => {
-    if (!tanggal) return "..................";
-    const date = new Date(tanggal);
-    const options = { day: "numeric", month: "long", year: "numeric" };
-    return date.toLocaleDateString("id-ID", options);
-  };
+    // Ambil data state dari useLocation
+    const dataDariState = location.state;
 
-  // === HANDLE PRINT ===
-  const handlePrint = () => {
-    printSurat("surat-bimbingan", "Surat Permohonan Bimbingan Katekesasi", data.nama || "Surat_Bimbingan_Katekisasi");
-  }
+    // Fetch data surat dari backend
+    useEffect(() => {
+        const idSuratDariDaftar = localStorage.getItem("idSuratPrint");
+        
+        if (idSuratDariDaftar) {
+            console.log("Mendeteksi ID Print dari localStorage:", idSuratDariDaftar);
+            
+            fetch(`http://localhost:5000/api/surat/${idSuratDariDaftar}`) 
+                .then((res) => {
+                    if (!res.ok) throw new Error("Gagal mengambil data surat dari DB");
+                    return res.json();
+                })
+                .then((result) => {
+                    setData(result.data_input_json); 
+                })
+                .catch((err) => {
+                    console.error("Gagal load detail surat:", err);
+                    alert("Gagal memuat data surat: " + err.message);
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                    localStorage.removeItem("idSuratPrint"); 
+                });
+
+        } else if (dataDariState) {
+            // Jika datang dari tombol "Kirim Permohonan" (surat baru)
+            console.log("Mendeteksi data dari state (surat baru)");
+            setData(dataDariState);
+            setIsLoading(false);
+
+        } else {
+            // Default jika tidak ada ID dan tidak ada state
+            console.log("Mode pratinjau kosong/default");
+            setData({});
+            setIsLoading(false);
+        }
+
+    }, [dataDariState]); // Dependency dataDariState untuk kasus surat baru (opsional)
+
+
+    // ... (formatTanggalIndonesia dan handlePrint tetap sama) ...
+    const formatTanggalIndonesia = (tanggal) => {
+        if (!tanggal) return "..................";
+        const date = new Date(tanggal);
+        const options = { day: "numeric", month: "long", year: "numeric" };
+        return date.toLocaleDateString("id-ID", options);
+    };
+
+    const handlePrint = () => {
+        // Pastikan Anda mengimpor printSurat
+        // import { printSurat } from "../../../components/printSurat"; 
+        printSurat(
+            "surat-bimbingan",
+            `Surat-Permohonan-Bimbingan_Katekisasi_${data.namaAnak || "TanpaNama"}`
+        );
+    };
+
+    if (isLoading) {
+        return (
+            // ... (Tampilan Loading) ...
+            <div>
+                <NavbarComponent />
+                <div className="container mt-5 text-center">
+                    <p>Memuat data surat...</p>
+                </div>
+            </div>
+        );
+    }
   return (
     <div>
       <NavbarComponent />

@@ -368,6 +368,66 @@ const Pertunangan = () => {
                     onChange={handleChange}
                   />
                 </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Tempat Baptis</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="tempatBaptisLaki"
+                    value={formData.tempatBaptisLaki}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Tanggal Baptis</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="tanggalBaptisLaki"
+                    value={formData.tanggalBaptisLaki}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Tempat Sidi</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="tempatSidiLaki"
+                    value={formData.tempatSidiLaki}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Tanggal Sidi</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="tanggalSidiLaki"
+                    value={formData.tanggalSidiLaki}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Warga Gereja</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="wargaGerejaLaki"
+                    value={formData.wargaGerejaLaki}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Alamat Gereja</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="alamatGerejaLaki"
+                    value={formData.alamatGerejaLaki}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
 
               <hr />

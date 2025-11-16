@@ -1,70 +1,130 @@
-import React from "react";
+import React, { useEffect, useState } from "react"; // ✅ DITAMBAH: useEffect & useState
 import { useLocation, useNavigate } from "react-router-dom";
 import { NavbarComponent } from "../../../components/NavbarComponent";
 import html2pdf from "html2pdf.js";
 import { printSurat } from "../../../components/printSurat";
 
-const SuratTemplateBesukPerjamuan = () => {
-  const { state } = useLocation();
-  const navigate = useNavigate();
+const SuratTemplateBesukPerjamuan = () => { 
+    // 💡 SEMUA HOOK HARUS DI SINI (TOP LEVEL)
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [data, setData] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
 
-  const data = state || {}; // seluruh payload langsung di sini!
-
-  const daftarHadir = data.daftarHadir || [];
-  const tidakHadir = data.tidakHadir || [];
-  const wilayahLain = data.wilayahLain || [];
-  const tamuGereja = data.tamuGereja || [];
-  const mengetahui = data.mengetahui || [];
-  const jumlahKeseluruhan = data.jumlahKeseluruhan || 0;
-
-  // Format tanggal ke bahasa Indonesia
-  const formatTanggalIndonesia = (tanggal) => {
-    if (!tanggal) return "................";
-    const date = new Date(tanggal);
-    const options = { day: "numeric", month: "long", year: "numeric" };
-    return date.toLocaleDateString("id-ID", options);
-  };
-
+    // Ambil data state dari useLocation
+    const dataDariState = location.state;
+    
+    // ✅ DEKLARASI VARIABEL DARI STATE UNTUK DIGUNAKAN DI RETURN
+    // Logika untuk Besuk Perjamuan biasanya berfokus pada daftar array dalam data
+    const daftarHadir = data.daftarHadir || []; // Diambil dari data_input_json
+    const tidakHadir = data.tidakHadir || [];
+    const wilayahLain = data.wilayahLain || [];
+    const tamuGereja = data.tamuGereja || [];
+    const mengetahui = data.mengetahui || [];
+    const jumlahKeseluruhan = data.jumlahKeseluruhan || (daftarHadir.length + wilayahLain.length + tamuGereja.length);
+    // Note: Logika adaPasangan (dari contoh sebelumnya) dihapus karena tidak relevan di sini.
 
 
-  // === HANDLE PRINT ===
-  const handlePrint = () => {
-    printSurat("laporan-besuk-perjamuan", "Laporan Besuk Perjamuan Kudus", data.wilayah || "Laporan_Besuk_Perjamuan");
-  }
+    // Fetch data surat dari backend
+    useEffect(() => {
+        const idSuratDariDaftar = localStorage.getItem("idSuratPrint");
+        
+        if (idSuratDariDaftar) {
+            console.log("Mendeteksi ID Print dari localStorage:", idSuratDariDaftar);
+            
+            fetch(`http://localhost:5000/api/surat/${idSuratDariDaftar}`) 
+                .then((res) => {
+                    if (!res.ok) throw new Error("Gagal mengambil data surat dari DB");
+                    return res.json();
+                })
+                .then((result) => {
+                    // result.data_input_json seharusnya sudah berupa objek karena driver MySQL
+                    setData(result.data_input_json); 
+                })
+                .catch((err) => {
+                    console.error("Gagal load detail surat:", err);
+                    alert("Gagal memuat data surat: " + err.message);
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                    localStorage.removeItem("idSuratPrint"); 
+                });
+
+        } else if (dataDariState) {
+            // Jika datang dari tombol "Kirim Permohonan" (surat baru)
+            console.log("Mendeteksi data dari state (surat baru)");
+            setData(dataDariState);
+            setIsLoading(false);
+
+        } else {
+            // Default jika tidak ada ID dan tidak ada state
+            console.log("Mode pratinjau kosong/default");
+            setData({});
+            setIsLoading(false);
+        }
+
+    }, [dataDariState]);
 
 
-  // === Komponen Tabel Dinamis ===
-  const renderTable = (title, list) => (
-    <>
-      <p style={{ fontWeight: "bold", marginTop: "15px" }}>{title}</p>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={{ border: "1px solid #000", width: "5%" }}>No</th>
-            <th style={{ border: "1px solid #000", width: "45%" }}>Nama</th>
-            <th style={{ border: "1px solid #000" }}>Keterangan</th>
-          </tr>
-        </thead>
-        <tbody>
-          {list.length > 0 ? (
-            list.map((item, i) => (
-              <tr key={i}>
-                <td style={{ border: "1px solid #000", textAlign: "center" }}>{i + 1}</td>
-                <td style={{ border: "1px solid #000" }}>{item.nama || ".................."}</td>
-                <td style={{ border: "1px solid #000" }}>{item.keterangan || ".................."}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="3" style={{ border: "1px solid #000", textAlign: "center" }}>
-                Tidak ada data
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </>
-  );
+    // ✅ Fungsi format tanggal ke Indonesia
+    const formatTanggalIndonesia = (tanggal) => {
+        if (!tanggal) return "..................";
+        const date = new Date(tanggal);
+        const options = { day: "numeric", month: "long", year: "numeric" };
+        return date.toLocaleDateString("id-ID", options);
+    };
+
+    // ✅ Fungsi Print
+    const handlePrint = () => {
+        printSurat(
+            "laporan-besuk-perjamuan", // ID elemen div yang akan dicetak
+            `Laporan-Besuk-Perjamuan_${data.wilayah || "TanpaWilayah"}`
+        );
+    };
+
+    // === Komponen Tabel Dinamis ===
+    const renderTable = (title, list) => (
+        <>
+            <p style={{ fontWeight: "bold", marginTop: "15px" }}>{title}</p>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                    <tr>
+                        <th style={{ border: "1px solid #000", width: "5%" }}>No</th>
+                        <th style={{ border: "1px solid #000", width: "45%" }}>Nama</th>
+                        <th style={{ border: "1px solid #000" }}>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {list.length > 0 ? (
+                        list.map((item, i) => (
+                            <tr key={i}>
+                                <td style={{ border: "1px solid #000", textAlign: "center" }}>{i + 1}</td>
+                                <td style={{ border: "1px solid #000" }}>{item.nama || ".................."}</td>
+                                <td style={{ border: "1px solid #000" }}>{item.keterangan || ".................."}</td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="3" style={{ border: "1px solid #000", textAlign: "center" }}>
+                                Tidak ada data
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </>
+    );
+
+    if (isLoading) {
+        return (
+            <div>
+                <NavbarComponent />
+                <div className="container mt-5 text-center">
+                    <p>Memuat data laporan dari database...</p>
+                </div>
+            </div>
+        );
+    }
 
   return (
     <div>

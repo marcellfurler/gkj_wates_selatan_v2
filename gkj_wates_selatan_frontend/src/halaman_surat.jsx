@@ -16,6 +16,12 @@ const DaftarSuratJemaat = () => {
     CALON_MAJELIS: "calon-majelis",
     BESUK_PERJAMUAN: "besuk-perjamuan",
     KATEKISASI: "katekisasi",
+    KELAHIRAN: "pemberitahuan-kelahiran",
+    NIKAH: "nikah",
+    PENG_PERCAYA: "pengakuan-percaya",
+    // PINDAH_GEREJA : ""
+    TOBAT: "pertobatan",
+    TUNANGAN: "tunangan"
   };
 
 

@@ -4,7 +4,7 @@ import { NavbarComponent } from "../../components/NavbarComponent";
 
 const BimbinganKatekesasi = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState({
+  const [formData, setFormData] = useState({
     nama: "",
     tempatLahir: "",
     tanggalLahir: "",
@@ -19,7 +19,7 @@ const BimbinganKatekesasi = () => {
   });
 
   const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
