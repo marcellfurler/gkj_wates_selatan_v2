@@ -73,7 +73,7 @@ router.post(
 
 // PUT update jemaat
 router.put(
-  "/:nik",
+  "/:kodeJemaat",
   upload.fields([
     { name: "foto", maxCount: 1 },
     { name: "sertifikatNikah", maxCount: 1 },
@@ -97,6 +97,6 @@ router.post(
 );
 
 // Hapus jemaat
-router.delete("/hapus/:nik", dataJemaatController.hapusJemaat);
+router.delete("/hapus/:kodeJemaat", dataJemaatController.hapusJemaat);
 
 export default router;

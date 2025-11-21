@@ -16,7 +16,7 @@ const HalamanTambahDataBaru = () => {
   const [previewFoto, setPreviewFoto] = useState(null);
   const [formData, setFormData] = useState({
     namaLengkap: "",
-    nik: "",
+    kodeJemaat: "",
     alamat: "",
     tempatLahir: "",
     tanggalLahir: "",
@@ -107,7 +107,7 @@ const handleSubmit = async (e) => {
 
         // === DATA DASAR JEMAAT ===
         form.append("namaLengkap", formData.namaLengkap || "");
-        form.append("nik", formData.nik || "");
+        form.append("kodeJemaat", formData.kodeJemaat || "");
         form.append("alamat", formData.alamat || "");
         form.append("tempatLahir", formData.tempatLahir || "");
         form.append("tanggalLahir", formData.tanggalLahir || "");
@@ -152,6 +152,7 @@ const handleSubmit = async (e) => {
             if (formData.dataNikah?.sertifikat instanceof File) { form.append("sertifikatNikah", formData.dataNikah.sertifikat); }
             if (formData.dataSidi?.sertifikat instanceof File) { form.append("sertifikatSidi", formData.dataSidi.sertifikat); }
             if (formData.dataBaptis?.sertifikat instanceof File) { form.append("sertifikatBaptis", formData.dataBaptis.sertifikat); }
+            
         }
 
         // Pendidikan Dinamis
@@ -256,6 +257,7 @@ const handleSubmit = async (e) => {
 
   const showSidi = formData.statusSidi === "Sidi";
   const showBaptis = formData.statusBaptis === "Baptis";
+  const showMeninggal = formData.statusMeninggal === "Meninggal";
 
   return (
     <>
@@ -353,14 +355,6 @@ const handleSubmit = async (e) => {
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label">NIK</label>
-                  <input
-                    type="text"
-                    name="nik"
-                    className="form-control mb-3"
-                    value={formData.nik}
-                    onChange={handleChange}
-                  />
 
                   <label className="form-label">Tanggal Lahir</label>
                   <input
@@ -587,6 +581,7 @@ const handleSubmit = async (e) => {
                     <option value="Pendeta">Pendeta</option>
                     <option value="Majelis">Majelis</option>
                     <option value="Koordinator Pelayanan">Koordinator Pelayanan</option>
+                    <option value="Meninggal">Meninggal</option>
                   </select>
 
                   <label className="form-label">Status Sidi</label>
@@ -749,67 +744,184 @@ const handleSubmit = async (e) => {
             <form onSubmit={handleSubmit}>
               <div className="row">
                 {showNikah && (
-                  <div className="col-md-4 mb-3">
-                    <h5 className="text-center mb-2">Sertifikat Nikah</h5>
+                  <div className="col-md-4 mb-6">
+                    <h5 className="text-center mb-2">Informasi Nikah</h5>
+
+                    {/* Tanggal Meninggal */}
+                    <label className="form-label">Tanggal Nikah</label>
                     <input
-                      type="file"
-                      name="sertifikatNikah"
-                      accept="image/*,application/pdf"
-                      className="form-control"
+                      type="date"
+                      name="tanggalNikah"
+                      className="form-control mb-2"
+                      value={formData.tanggalNikah || ""}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          dataNikah: { sertifikat: e.target.files[0] },
+                          tanggalNikah: e.target.value,
                         })
                       }
                     />
-                    {formData.dataNikah?.sertifikat && (
-                      <p className="mt-1">{formData.dataNikah.sertifikat.name}</p>
-                    )}
+
+                    {/* Tempat Meninggal */}
+                    <label className="form-label">Tempat Nikah</label>
+                    <input
+                      type="text"
+                      name="tempatNikah"
+                      className="form-control mb-2"
+                      placeholder="Masukkan tempat Menikah"
+                      value={formData.tempatNikah || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          tempatNikah: e.target.value,
+                        })
+                      }
+                    />
+
+                    <label className="form-label">Informasi Pasangan</label>
+                    <input
+                      type="text"
+                      name="namaPasangan"
+                      className="form-control mb-2"
+                      placeholder="Masukkan tempat nama pasangan"
+                      value={formData.namaPasangan || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          namaPasangan: e.target.value,
+                        })
+                      }
+                    />
+                    
+
+                    <input
+                      type="text"
+                      name="gerejaAsal"
+                      className="form-control mb-2"
+                      placeholder="Masukkan gereja asal"
+                      value={formData.gerejaAsal || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          gerejaAsal: e.target.value,
+                        })
+                      }
+                    />
                   </div>
                 )}
+
 
                 {showSidi && (
                   <div className="col-md-4 mb-3">
-                    <h5 className="text-center mb-2">Sertifikat Sidi</h5>
+                    <h5 className="text-center mb-2">Informasi Sidi</h5>
+
+                    {/* Tanggal Meninggal */}
+                    <label className="form-label">Tanggal Sidi</label>
                     <input
-                      type="file"
-                      name="sertifikatSidi"
-                      accept="image/*,application/pdf"
-                      className="form-control"
+                      type="date"
+                      name="tanggalSidi"
+                      className="form-control mb-2"
+                      value={formData.tanggalSidi || ""}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          dataSidi: { sertifikat: e.target.files[0] },
+                          tanggalSidi: e.target.value,
                         })
                       }
                     />
-                    {formData.dataSidi?.sertifikat && (
-                      <p className="mt-1">{formData.dataSidi.sertifikat.name}</p>
-                    )}
+
+                    {/* Tempat Meninggal */}
+                    <label className="form-label">Tempat Sidi</label>
+                    <input
+                      type="text"
+                      name="tempatSidi"
+                      className="form-control"
+                      placeholder="Masukkan tempat Sidi"
+                      value={formData.tempatSidi || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          tempatSidi: e.target.value,
+                        })
+                      }
+                    />
                   </div>
-                )}
+                )}  
 
                 {showBaptis && (
                   <div className="col-md-4 mb-3">
-                    <h5 className="text-center mb-2">Sertifikat Baptis</h5>
+                    <h5 className="text-center mb-2">Informasi Baptis</h5>
+
+                    {/* Tanggal Meninggal */}
+                    <label className="form-label">Tanggal Baptis</label>
                     <input
-                      type="file"
-                      name="sertifikatBaptis"
-                      accept="image/*,application/pdf"
-                      className="form-control"
+                      type="date"
+                      name="tanggalBaptis"
+                      className="form-control mb-2"
+                      value={formData.tanggalBaptis || ""}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          dataBaptis: { sertifikat: e.target.files[0] },
+                          tanggalBaptis: e.target.value,
                         })
                       }
                     />
-                    {formData.dataBaptis?.sertifikat && (
-                      <p className="mt-1">{formData.dataBaptis.sertifikat.name}</p>
-                    )}
+
+                    {/* Tempat Meninggal */}
+                    <label className="form-label">Tempat Baptis</label>
+                    <input
+                      type="text"
+                      name="tempatBaptis"
+                      className="form-control"
+                      placeholder="Masukkan tempat baptis"
+                      value={formData.tempatBaptis || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          tempatBaptis: e.target.value,
+                        })
+                      }
+                    />
                   </div>
                 )}
+
+                {showMeninggal && (
+                  <div className="col-md-4 mb-3">
+                    <h5 className="text-center mb-2">Informasi Meninggal</h5>
+
+                    {/* Tanggal Meninggal */}
+                    <label className="form-label">Tanggal Meninggal</label>
+                    <input
+                      type="date"
+                      name="tanggalMeninggal"
+                      className="form-control mb-2"
+                      value={formData.tanggalMeninggal || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          tanggalMeninggal: e.target.value,
+                        })
+                      }
+                    />
+
+                    {/* Tempat Meninggal */}
+                    <label className="form-label">Tempat Meninggal</label>
+                    <input
+                      type="text"
+                      name="tempatMeninggal"
+                      className="form-control"
+                      placeholder="Masukkan tempat meninggal"
+                      value={formData.tempatMeninggal || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          tempatMeninggal: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                )}
+
               </div>
 
               <div className="text-end mt-4">

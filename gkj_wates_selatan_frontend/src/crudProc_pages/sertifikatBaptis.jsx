@@ -11,12 +11,12 @@ const SertifikatBaptis = () => {
   const [sertifikatUrl, setSertifikatUrl] = useState("");
 
   useEffect(() => {
-    const nik = state?.nik; // ✅ gunakan versi kecil
+    const kodeJemaat = state?.kodeJemaat; // ✅ gunakan versi kecil
 
-    if (nik) {
-      console.log("📤 Mengirim request untuk NIK:", nik);
+    if (kodeJemaat) {
+      console.log("📤 Mengirim request untuk kodeJemaat:", kodeJemaat);
       
-      fetch(`http://localhost:5000/api/baptis/${nik}`)
+      fetch(`http://localhost:5000/api/baptis/${kodeJemaat}`)
         .then((res) => {
           console.log("📥 Status response:", res.status);
           return res.json();
@@ -37,7 +37,7 @@ const SertifikatBaptis = () => {
           console.error("❌ Error fetch:", err);
         });
     } else {
-      console.log("⚠️ State atau NIK tidak ada:", state);
+      console.log("⚠️ State atau kodeJemaat tidak ada:", state);
     }
   }, [state]);
 

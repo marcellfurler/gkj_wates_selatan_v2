@@ -1,9 +1,9 @@
 import express from "express";
-import { getSertifikatNikahByNik } from "../controllers/dataNikahController.js";
+import { getSertifikatNikahBykodeJemaat } from "../controllers/dataNikahController.js";
 
 const router = express.Router();
 
 // param harus lowercase dan sama dengan controller
-router.get("/:nik", getSertifikatNikahByNik);
+router.get("/:kodeJemaat", getSertifikatNikahBykodeJemaat);
 
 export default router;

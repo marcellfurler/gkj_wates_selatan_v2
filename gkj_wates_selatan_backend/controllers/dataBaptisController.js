@@ -1,24 +1,24 @@
 import { db } from "../config/db.js"; // pastikan file db.js ada dan tersambung ke MySQL
 
-export const getSertifikatBaptisByNik = (req, res) => {
-  const { nik } = req.params;
-  console.log("📥 NIK diterima dari frontend (Baptis):", nik);
+export const getSertifikatBaptisBykodeJemaat = (req, res) => {
+  const { kodeJemaat } = req.params;
+  console.log("📥 NIK diterima dari frontend (Baptis):", kodeJemaat);
 
   const query = `
     SELECT sertifikatBaptis
     FROM dataBaptis
-    WHERE NIK = ?
+    WHERE kodeJemaat = ?
     LIMIT 1
   `;
 
-  db.query(query, [nik], (err, results) => {
+  db.query(query, [kodeJemaat], (err, results) => {
     if (err) {
       console.error("❌ Gagal mengambil sertifikat baptis:", err);
       return res.status(500).json({ message: "Gagal mengambil data sertifikat baptis" });
     }
 
     if (results.length === 0) {
-      console.log("⚠️ Tidak ada sertifikat untuk NIK:", nik);
+      console.log("⚠️ Tidak ada sertifikat untuk NIK:", kodeJemaat);
       return res.status(404).json({ message: "Sertifikat baptis tidak ditemukan" });
     }
 

@@ -31,7 +31,7 @@ const DetailListItem = ({ label, value }) => (
 const DetailJemaat = ({ data }) => {
   const navigate = useNavigate();
   const dataPribadi = [
-    { label: 'NIK', value: data.NIK || '-' },
+    { label: 'kodeJemaat', value: data.kodeJemaat || '-' },
     { label: 'Nama Lengkap', value: data.namaLengkap || '-' },
     { label: 'TTL', value: `${data.tempatLahir || '-'}, ${data.tanggalLahir || '-'}` },
     { label: 'Jenis Kelamin', value: data.jenisKelamin || '-' },
@@ -64,11 +64,11 @@ const DetailJemaat = ({ data }) => {
     { label: 'Status Pelayanan', value: data.namaPelayanan || '-' },
   ];
 
-    const handleHapus = async (nik) => {
+    const handleHapus = async (kodeJemaat) => {
       if (!window.confirm("Apakah Anda yakin ingin menghapus jemaat ini?")) return;
 
       try {
-        const response = await axios.delete(`http://localhost:5000/api/jemaat/hapus/${nik}`);
+        const response = await axios.delete(`http://localhost:5000/api/jemaat/hapus/${kodeJemaat}`);
         alert(response.data.message);
         navigate("/data"); // ✅ kembali ke daftar jemaat
       } catch (error) {
@@ -120,7 +120,7 @@ const DetailJemaat = ({ data }) => {
 
               {/* TOMBOL HAPUS */}
               <button
-                  onClick={() => handleHapus(data.NIK)}
+                  onClick={() => handleHapus(data.kodeJemaat)}
                   // Kelas sudah benar: btn btn-danger btn-sm fw-bold
                   className="btn btn-danger btn-sm fw-bold" 
                   title="Hapus Data"

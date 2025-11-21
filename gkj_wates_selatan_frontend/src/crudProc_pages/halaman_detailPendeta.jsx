@@ -29,7 +29,7 @@ const HalamanDetailPendeta = () => {
     
     const navigate = useNavigate();
     const [searchParams] = useSearchParams(); 
-    const nik = searchParams.get('nik'); 
+    const kodeJemaat = searchParams.get('kodeJemaat'); 
     
     const [pendetaData, setPendetaData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -42,8 +42,8 @@ const HalamanDetailPendeta = () => {
         setLoading(true);
         setError(null);
         try {
-            console.log("📡 Fetching data Pendeta untuk NIK:", nik);
-            const response = await fetch(`${API_URL}/${nik}`); 
+            console.log("📡 Fetching data Pendeta untuk kodeJemaat:", kodeJemaat);
+            const response = await fetch(`${API_URL}/${kodeJemaat}`); 
             console.log("📊 Response status:", response.status);
             
             const data = await response.json();
@@ -65,15 +65,15 @@ const HalamanDetailPendeta = () => {
     };
 
     useEffect(() => {
-        if (nik) {
-            console.log("✅ NIK berhasil dibaca dari URL:", nik);
+        if (kodeJemaat) {
+            console.log("✅ kodeJemaat berhasil dibaca dari URL:", kodeJemaat);
             fetchPendetaData();
         } else {
-            console.error("❌ NIK tidak ada di URL Search Params.");
-            setError("NIK tidak ditemukan. Pastikan Anda mengakses halaman ini dengan ?nik=xxx");
+            console.error("❌ kodeJemaat tidak ada di URL Search Params.");
+            setError("kodeJemaat tidak ditemukan. Pastikan Anda mengakses halaman ini dengan ?kodeJemaat=xxx");
             setLoading(false);
         }
-    }, [nik]);
+    }, [kodeJemaat]);
 
     // Helper untuk menampilkan Sertifikat/File
     const renderSertifikat = (path, name) => {
@@ -149,7 +149,7 @@ const HalamanDetailPendeta = () => {
     const fotoUrl = foto ? `http://localhost:5000/${foto}` : logoGKJ;
 
     const dataPribadi = [
-        { label: 'NIK', value: pendetaData.NIK || '-' },
+        { label: 'kodeJemaat', value: pendetaData.kodeJemaat || '-' },
         { label: 'Nama Lengkap', value: namaLengkap || '-' },
         { label: 'TTL', value: `${tempatLahir || '-'}, ${formatTanggal(tanggalLahir)}` },
         { label: 'Jenis Kelamin', value: jenisKelamin || '-' },
@@ -217,7 +217,7 @@ const HalamanDetailPendeta = () => {
                                 <p className="text-muted small mb-0 fw-bold">
                                     <FontAwesomeIcon icon={faUserTag} className="me-1"/> {jabatanPendeta || 'PENDETA'}
                                 </p>
-                                <p className="text-muted small">NIK: {pendetaData.NIK}</p>
+                                <p className="text-muted small">kodeJemaat: {pendetaData.kodeJemaat}</p>
                             </div>
 
                             {/* DATA DETAIL (KANAN) */}

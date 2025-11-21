@@ -17,7 +17,7 @@ const EditJemaat = () => {
 
   const [formData, setFormData] = useState(
     state?.data || {
-      NIK: "",
+      kodeJemaat: "",
       namaLengkap: "",
       tempatLahir: "",
       tanggalLahir: "",
@@ -105,7 +105,7 @@ const EditJemaat = () => {
   // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const nik = formData.NIK;
+    const kodeJemaat = formData.kodeJemaat;
     const formDataToSend = new FormData();
 
     // Append semua field jemaat
@@ -133,7 +133,7 @@ const EditJemaat = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/jemaat/${nik}`, {
+      const res = await fetch(`http://localhost:5000/api/jemaat/${kodeJemaat}`, {
         method: "PUT",
         body: formDataToSend,
       });
@@ -282,6 +282,7 @@ const EditJemaat = () => {
                         <option value="Pendeta">Pendeta</option>
                         <option value="Majelis">Majelis</option>
                         <option value="Koordinator Pelayanan">Koordinator Pelayanan</option>
+                        <option value="Meninggal">Meninggal</option>
                       </select>
                   </div>
                 </div>

@@ -3,22 +3,22 @@ import { db } from "../config/db.js";
 /**
  * Mengambil detail LENGKAP Pendeta (gabungan dataJemaat + dataPendeta + dataRiwayatPendeta) berdasarkan NIK.
  */
-export const getPendetaDetailByNIK = (req, res) => {
+export const getPendetaDetailBykodeJemaat = (req, res) => {
     // ✅ Ambil NIK dari query parameter ATAU route parameter
-    const nik = req.query.nik || req.params.nik;
+    const kodeJemaat = req.query.kodeJemaat || req.params.kodeJemaat;
 
-    if (!nik) {
+    if (!kodeJemaat) {
         return res.status(400).json({ 
-            message: "NIK tidak ditemukan. Gunakan ?nik=xxx atau /:nik" 
+            message: "NIK tidak ditemukan. Gunakan ?kodeJemaat=xxx atau /:kodeJemaat" 
         });
     }
 
-    console.log("🔍 Mengambil detail Pendeta dengan NIK:", nik);
+    console.log("🔍 Mengambil detail Pendeta dengan kodeJemaat:", kodeJemaat);
 
     // Query menggunakan INNER JOIN ke dataPendeta (wajib Pendeta) dan LEFT JOIN ke dataRiwayatPendeta (opsional riwayat)
     const query = `
     SELECT
-        dj.NIK,
+        dj.kodeJemaat,
         dj.namaLengkap,
         dj.tempatLahir,
         dj.tanggalLahir,
@@ -34,15 +34,15 @@ export const getPendetaDetailByNIK = (req, res) => {
         drp.tahunMulai,
         drp.tahunSelesai
     FROM dataJemaat dj
-    INNER JOIN dataPendeta dp ON dj.NIK = dp.nik
+    INNER JOIN dataPendeta dp ON dj.kodeJemaat = dp.kodeJemaat
     LEFT JOIN dataRiwayatPendeta drp ON dp.kodePendeta = drp.kodePendeta
-    WHERE dj.NIK = ?
+    WHERE dj.kodeJemaat = ?
     ORDER BY drp.tahunMulai DESC
     `;
 
-    db.query(query, [nik], (err, results) => {
+    db.query(query, [kodeJemaat], (err, results) => {
         if (err) {
-            console.error("❌ Error getPendetaDetailByNIK:", err);
+            console.error("❌ Error getPendetaDetailBykodeJemaat:", err);
             return res.status(500).json({ 
                 message: "Gagal mengambil data Pendeta", 
                 error: err.message 
@@ -50,9 +50,9 @@ export const getPendetaDetailByNIK = (req, res) => {
         }
 
         if (results.length === 0 || !results[0].jabatanPendeta) {
-            console.log("⚠️ Data Pendeta tidak ditemukan untuk NIK:", nik);
+            console.log("⚠️ Data Pendeta tidak ditemukan untuk kodeJemaat:", kodeJemaat);
             return res.status(404).json({ 
-                message: "Data Pendeta tidak ditemukan untuk NIK: " + nik 
+                message: "Data Pendeta tidak ditemukan untuk kodeJemaat: " + kodeJemaat
             });
         }
 
@@ -61,7 +61,7 @@ export const getPendetaDetailByNIK = (req, res) => {
         // 1. Ambil data dasar dari baris pertama
         const firstRow = results[0];
         const pendetaData = {
-            NIK: firstRow.NIK,
+            kodeJemaat: firstRow.kodeJemaat,
             namaLengkap: firstRow.namaLengkap,
             tempatLahir: firstRow.tempatLahir,
             tanggalLahir: firstRow.tanggalLahir,

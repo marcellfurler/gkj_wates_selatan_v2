@@ -26,17 +26,17 @@ const TabelDataJemaat = () => {
   if (loading) {
     return <p className="text-center mt-5">⏳ Memuat data jemaat...</p>;
   }
-  const ComponentNavigasi = ({ NIK_yang_dikirim }) => {
+  const ComponentNavigasi = ({ kodeJemaat_yang_dikirim }) => {
     const navigate = useNavigate();
 
     const handleDetailClick = () => {
-        const nik = NIK_yang_dikirim; // Misalkan ini NIK = 213
+        const kodeJemaat = kodeJemaat_yang_dikirim; // Misalkan ini NIK = 213
 
         // ✅ CARA BENAR: Navigasi dengan Query Parameter
-        navigate(`/detailPendeta?nik=${nik}`); 
+        navigate(`/detailPendeta?kodeJemaat=${kodeJemaat}`); 
         
         // Console log yang Anda lihat:
-        console.log("Pengiriman NIK:", nik);
+        console.log("Pengiriman kodeJemaat:", kodeJemaat);
     };
 
     return (
@@ -83,9 +83,9 @@ const TabelDataJemaat = () => {
                       {data.statusSidi === 'Sidi' ? (
                         <Link 
                           to="/sertifikat-sidi" 
-                          state={{ nik: data.NIK, Lengkap: data.namaLengkap }} // ✅ kirim 'nik' kecil
+                          state={{ kodeJemaat: data.kodeJemaat, Lengkap: data.namaLengkap }} // ✅ kirim 'nik' kecil
                           className="text-primary"
-                          onClick={() => console.log("🔗 Mengirim NIK (Sidi):", data.NIK)}
+                          onClick={() => console.log("🔗 Mengirim kodeJemaat (Sidi):", data.kodeJemaat)}
                         >
                           {data.statusSidi}
                         </Link>
@@ -99,9 +99,9 @@ const TabelDataJemaat = () => {
                       {data.statusBaptis === 'Baptis' ? (
                         <Link 
                           to="/sertifikat-baptis"
-                          state={{ nik: data.NIK, namaLengkap: data.namaLengkap }} 
+                          state={{ kodeJemaat: data.kodeJemaat, namaLengkap: data.namaLengkap }} 
                           className="text-primary"
-                          onClick={() => console.log("🔗 Mengirim NIK:", data.NIK)}
+                          onClick={() => console.log("🔗 Mengirim kodeJemaat:", data.kodeJemaat)}
                         >
                           {data.statusBaptis}
                         </Link>
@@ -114,9 +114,9 @@ const TabelDataJemaat = () => {
                       {data.statusNikah === 'Nikah' ? (
                       <Link 
                         to="/sertifikat-nikah" 
-                        state={{ nik: data.NIK, namaLengkap: data.namaLengkap }} 
+                        state={{ kodeJemaat: data.kodeJemaat, namaLengkap: data.namaLengkap }} 
                         className="text-primary"
-                        onClick={() => console.log("🔗 Mengirim NIK:", data.NIK)}
+                        onClick={() => console.log("🔗 Mengirim kodeJemaat:", data.kodeJemaat)}
                       >
                         {data.statusNikah}
                       </Link>
@@ -133,11 +133,11 @@ const TabelDataJemaat = () => {
                       {data.namaPelayanan === 'Pendeta' ? (
                         <Link
                           // ✅ PERBAIKAN: Gunakan template literal untuk menambahkan ?nik=
-                          to={`/detailPendeta?nik=${data.NIK}`} 
+                          to={`/detailPendeta?kodeJemaat=${data.kodeJemaat}`} 
                           // Hapus attribute 'state' karena kita menggunakan Query Parameter
                           // state={{ nik: data.NIK, namaLengkap: data.namaLengkap }} 
                           className="text-primary" 
-                          onClick={() => console.log("🔗 Mengirim NIK (Query Param):", data.NIK)}
+                          onClick={() => console.log("🔗 Mengirim kodeJemaat (Query Param):", data.kodeJemaat)}
                         >
                           {data.namaPelayanan} 
                         </Link>

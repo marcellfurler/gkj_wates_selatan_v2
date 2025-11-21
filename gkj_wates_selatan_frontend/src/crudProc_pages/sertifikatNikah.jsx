@@ -11,12 +11,12 @@ const SertifikatNikah = () => {
   const [sertifikatUrl, setSertifikatUrl] = useState("");
 
   useEffect(() => {
-    const nik = state?.nik; // ✅ gunakan versi kecil
+    const kodeJemaat = state?.kodeJemaat; // ✅ gunakan versi kecil
 
-    if (nik) {
-      console.log("📤 Mengirim request untuk NIK:", nik);
+    if (kodeJemaat) {
+      console.log("📤 Mengirim request untuk kodeJemaat:", kodeJemaat);
       
-      fetch(`http://localhost:5000/api/nikah/${nik}`)
+      fetch(`http://localhost:5000/api/nikah/${kodeJemaat}`)
         .then((res) => {
           console.log("📥 Status response:", res.status);
           return res.json();

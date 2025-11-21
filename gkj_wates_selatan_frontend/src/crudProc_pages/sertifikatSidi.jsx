@@ -11,11 +11,11 @@ const SertifikatSidi = () => {
   const [sertifikatUrl, setSertifikatUrl] = useState("");
 
   useEffect(() => {
-    const nik = state?.nik; // ✅ gunakan huruf kecil agar konsisten
-    if (nik) {
-      console.log("📤 Mengirim request untuk NIK (Sidi):", nik);
+    const kodeJemaat = state?.kodeJemaat; // ✅ gunakan huruf kecil agar konsisten
+    if (kodeJemaat) {
+      console.log("📤 Mengirim request untuk NIK (Sidi):", kodeJemaat);
 
-      fetch(`http://localhost:5000/api/sidi/${nik}`)
+      fetch(`http://localhost:5000/api/sidi/${kodeJemaat}`)
         .then((res) => {
           console.log("📥 Status response:", res.status);
           return res.json();

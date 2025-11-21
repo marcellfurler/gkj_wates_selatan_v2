@@ -1,25 +1,25 @@
 // controllers/dataNikahController.js
 import { db } from "../config/db.js"; // ✅ tambahkan ini di paling atas
 
-export const getSertifikatNikahByNik = (req, res) => {
-  const { nik } = req.params; // huruf kecil sesuai di routes
-  console.log("📥 NIK diterima dari frontend:", nik);
+export const getSertifikatNikahBykodeJemaat = (req, res) => {
+  const { kodeJemaat } = req.params; // huruf kecil sesuai di routes
+  console.log("📥 kodeJemaat diterima dari frontend:", kodeJemaat);
 
   const query = `
     SELECT sertifikatNikah
     FROM dataNikah
-    WHERE NIK = ?
+    WHERE kodeJemaat = ?
     LIMIT 1
   `;
 
-  db.query(query, [nik], (err, results) => {
+  db.query(query, [kodeJemaat], (err, results) => {
     if (err) {
       console.error("❌ Gagal mengambil sertifikat nikah:", err);
       return res.status(500).json({ message: "Gagal mengambil data sertifikat nikah" });
     }
 
     if (results.length === 0) {
-      console.log("⚠️ Tidak ada sertifikat untuk NIK:", nik);
+      console.log("⚠️ Tidak ada sertifikat untuk kodeJemaat:", kodeJemaat);
       return res.status(404).json({ message: "Sertifikat nikah tidak ditemukan" });
     }
 

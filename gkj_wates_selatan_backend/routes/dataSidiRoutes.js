@@ -1,9 +1,9 @@
 import express from "express";
-import { getSertifikatSidiByNik } from "../controllers/dataSidiController.js";
+import { getSertifikatSidiBykodeJemaat } from "../controllers/dataSidiController.js";
 
 const router = express.Router();
 
 // ✅ Gunakan param huruf kecil agar konsisten
-router.get("/:nik", getSertifikatSidiByNik);
+router.get("/:kodeJemaat", getSertifikatSidiBykodeJemaat);
 
 export default router;
