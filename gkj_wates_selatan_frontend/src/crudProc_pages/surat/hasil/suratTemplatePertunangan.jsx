@@ -64,7 +64,7 @@ const SuratTemplatePertunangan = () => {
     const handlePrint = () => {
         // Pastikan Anda mengimpor printSurat
         // import { printSurat } from "../../../components/printSurat"; 
-        printSurat(
+        printSurat( 
             "surat-tunangan",
             `Surat-Tunangan_${data.namaLaki || "TanpaNama"} dan ${data.namaPerempuan || "TanpaNama"}`
         );
