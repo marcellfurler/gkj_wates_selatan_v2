@@ -366,10 +366,150 @@ export const hapusJemaat = async (req, res) => {
   }
 };
 
-// ===================================================
-// TAMBAH JEMAAT TANPA SERTIFIKAT
-// ===================================================
 export const tambahJemaat = async (req, res) => {
+  try {
+    const {
+      namaLengkap,
+      tempatLahir,
+      tanggalLahir,
+      jenisKelamin,
+      agama,
+      golonganDarah,
+      nomorTelepon,
+      alamat,
+      pepanthan,
+      namaPelayanan,
+      statusNikah,
+      tanggalNikah,
+      tempatNikah,
+      namaPasangan,
+      gerejaAsal,
+      statusSidi,
+      tanggalSidi,
+      tempatSidi,
+      statusBaptis,
+      tanggalBaptis,
+      tempatBaptis,
+      namaPekerjaan,
+      jabatan
+    } = req.body;
+
+    // Foto: pakai file multer atau default
+    const foto = req.file
+      ? `uploads/fotoProfil/${req.file.filename}`
+      : "uploads/fotoProfil/default.jpg";
+
+    const promisePool = db.promise();
+
+    // 1️⃣ Insert data utama, ambil kodeJemaat auto increment
+    const [result] = await promisePool.query(
+      `INSERT INTO dataJemaat
+      (namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [namaLengkap, tempatLahir, tanggalLahir || null, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto]
+    );
+
+    const kodeJemaat = result.insertId;
+
+    // 2️⃣ Insert relasi tambahan hanya jika ada data
+    const inserts = [];
+
+    // Nikah
+    if (statusNikah && statusNikah !== "") {
+      inserts.push(
+        promisePool.query(
+          `INSERT INTO dataNikah (kodeJemaat, statusNikah, tanggalNikah, tempatNikah, namaPasangan, gerejaAsal) 
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            kodeJemaat,
+            statusNikah,
+            tanggalNikah && tanggalNikah !== "" ? tanggalNikah : null,
+            tempatNikah && tempatNikah !== "" ? tempatNikah : null,
+            namaPasangan && namaPasangan !== "" ? namaPasangan : null,
+            gerejaAsal && gerejaAsal !== "" ? gerejaAsal : null
+          ]
+        )
+      );
+    }
+
+    // Sidi
+    if (statusSidi && statusSidi !== "") {
+      inserts.push(
+        promisePool.query(
+          `INSERT INTO dataSidi (kodeJemaat, statusSidi, tanggalSidi, tempatSidi) 
+           VALUES (?, ?, ?, ?)`,
+          [
+            kodeJemaat,
+            statusSidi,
+            tanggalSidi && tanggalSidi !== "" ? tanggalSidi : null,
+            tempatSidi && tempatSidi !== "" ? tempatSidi : null
+          ]
+        )
+      );
+    }
+
+    // Baptis
+    if (statusBaptis && statusBaptis !== "") {
+      inserts.push(
+        promisePool.query(
+          `INSERT INTO dataBaptis (kodeJemaat, statusBaptis, tanggalBaptis, tempatBaptis)
+           VALUES (?, ?, ?, ?)`,
+          [
+            kodeJemaat,
+            statusBaptis,
+            tanggalBaptis && tanggalBaptis !== "" ? tanggalBaptis : null,
+            tempatBaptis && tempatBaptis !== "" ? tempatBaptis : null
+          ]
+        )
+      );
+    }
+
+    // Pepanthan
+    if (pepanthan && pepanthan !== "") {
+      inserts.push(
+        promisePool.query(
+          `INSERT INTO dataPepanthan (kodeJemaat, namaPepanthan) VALUES (?, ?)`,
+          [kodeJemaat, pepanthan]
+        )
+      );
+    }
+
+    // Pekerjaan
+    if ((namaPekerjaan && namaPekerjaan !== "") || (jabatan && jabatan !== "")) {
+      inserts.push(
+        promisePool.query(
+          `INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatan) VALUES (?, ?, ?)`,
+          [kodeJemaat, namaPekerjaan || null, jabatan || null]
+        )
+      );
+    }
+
+    // Pelayanan
+    if (namaPelayanan && namaPelayanan !== "") {
+      inserts.push(
+        promisePool.query(
+          `INSERT INTO dataPelayanan (kodeJemaat, namaPelayanan) VALUES (?, ?)`,
+          [kodeJemaat, namaPelayanan]
+        )
+      );
+    }
+
+    await Promise.all(inserts);
+
+    res.json({ message: "✅ Data jemaat berhasil ditambahkan!", kodeJemaat });
+
+  } catch (err) {
+    console.error("❌ Error tambahJemaat:", err);
+    res.status(500).json({ message: "Gagal menambah jemaat", err: err.message });
+  }
+};
+
+
+
+// ===================================================
+// TAMBAH PENDETA TANPA SERTIFIKAT
+// ===================================================
+export const tambahPendeta = async (req, res) => {
   try {
     const {
       kodeJemaat,
@@ -383,275 +523,73 @@ export const tambahJemaat = async (req, res) => {
       alamat,
       pepanthan,
       namaPelayanan,
-      statusNikah,
-      statusSidi,
-      statusBaptis,
       namaPekerjaan,
-      jabatan
+      jabatan: jabatanPekerjaan,
+      jabatanPendeta,
+      dataPelayananList // JSON string dari frontend
     } = req.body;
+
+    const finalJabatanPendeta = jabatanPendeta || null;
 
     const foto = req.files?.foto?.[0]
       ? `uploads/fotoProfil/${req.files.foto[0].filename}`
       : null;
 
-    let pelayananStr = "";
+    const promisePool = db.promise();
 
-    if (namaPelayanan) {
-      if (Array.isArray(namaPelayanan)) pelayananStr = namaPelayanan[0];
-      else pelayananStr = namaPelayanan;
-
-      pelayananStr = pelayananStr.replace(/^["']?(.*?)["']?$/, "$1");
+    // Parse list riwayat pelayanan pendeta
+    let pelayananList = [];
+    if (dataPelayananList) {
+      try {
+        pelayananList = JSON.parse(dataPelayananList);
+      } catch {
+        pelayananList = [];
+      }
     }
 
-    await db.promise().query(
-      `
-      INSERT INTO dataJemaat 
-      (kodeJemaat, namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        kodeJemaat,
-        namaLengkap,
-        tempatLahir,
-        tanggalLahir,
-        jenisKelamin,
-        agama,
-        golonganDarah,
-        nomorTelepon,
-        alamat,
-        foto
-      ]
+    // 1️⃣ Insert data jemaat utama
+    await promisePool.query(
+      `INSERT INTO dataJemaat
+      ( namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto]
     );
 
-    if (statusNikah) {
-      await db.promise().query(
-        `INSERT INTO dataNikah (kodeJemaat, statusNikah) VALUES (?, ?)`,
-        [kodeJemaat, statusNikah]
+    // 2️⃣ Insert data pendukung jemaat
+    const inserts = [];
+    if (pepanthan) inserts.push(promisePool.query(`INSERT INTO dataPepanthan (kodeJemaat, namaPepanthan) VALUES (?, ?)`, [kodeJemaat, pepanthan]));
+    if (namaPelayanan) inserts.push(promisePool.query(`INSERT INTO dataPelayanan (kodeJemaat, namaPelayanan) VALUES (?, ?)`, [kodeJemaat, namaPelayanan]));
+    if (namaPekerjaan || jabatanPekerjaan) inserts.push(promisePool.query(`INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatan) VALUES (?, ?, ?)`, [kodeJemaat, namaPekerjaan || null, jabatanPekerjaan || null]));
+
+    // 3️⃣ Insert dataPendeta
+    const [pendetaResult] = await promisePool.query(
+      `INSERT INTO dataPendeta (kodeJemaat, jabatan) VALUES (?, ?)`,
+      [kodeJemaat, finalJabatanPendeta]
+    );
+    const kodePendeta = pendetaResult.insertId;
+
+    // 4️⃣ Insert riwayat pelayanan pendeta
+    if (pelayananList.length > 0) {
+      const pelayananPromises = pelayananList.map(p =>
+        promisePool.query(
+          `INSERT INTO dataRiwayatPendeta (kodePendeta, namaGereja, tahunMulai, tahunSelesai) VALUES (?, ?, ?, ?)`,
+          [kodePendeta, p.namaGereja || "", p.tahunMulai || null, p.tahunSelesai || null]
+        )
       );
+      await Promise.all(pelayananPromises);
     }
 
-    if (statusSidi) {
-      await db.promise().query(
-        `INSERT INTO dataSidi (kodeJemaat, statusSidi) VALUES (?, ?)`,
-        [kodeJemaat, statusSidi]
-      );
-    }
+    // Tunggu semua inserts selesai
+    await Promise.all(inserts);
 
-    if (statusBaptis) {
-      await db.promise().query(
-        `INSERT INTO dataBaptis (kodeJemaat, statusBaptis) VALUES (?, ?)`,
-        [kodeJemaat, statusBaptis]
-      );
-    }
+    res.json({
+      message: "✅ Pendeta berhasil ditambahkan!",
+      kodePendeta,
+      kodeJemaat
+    });
 
-    if (pepanthan) {
-      await db.promise().query(
-        `INSERT INTO dataPepanthan (kodeJemaat, namaPepanthan) VALUES (?, ?)`,
-        [kodeJemaat, pepanthan]
-      );
-    }
-
-    if (namaPekerjaan || jabatan) {
-      await db.promise().query(
-        `INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatan) VALUES (?, ?, ?)`,
-        [kodeJemaat, namaPekerjaan || "", jabatan || ""]
-      );
-    }
-
-    if (pelayananStr) {
-      await db.promise().query(
-        `INSERT INTO dataPelayanan (kodeJemaat, namaPelayanan) VALUES (?, ?)`,
-        [kodeJemaat, pelayananStr]
-      );
-    }
-
-    // // Pendidikan List
-    // let pendidikanList = [];
-    // if (req.body.pendidikan) {
-    //   try {
-    //     pendidikanList = JSON.parse(req.body.pendidikan);
-    //   } catch {
-    //     pendidikanList = [];
-    //   }
-    // }
-
-    // for (const p of pendidikanList) {
-    //   const { jenjangPendidikan, namaInstitusi, tahunLulus } = p;
-
-    //   if (jenjangPendidikan || namaInstitusi) {
-    //     await db.promise().query(
-    //       `
-    //       INSERT INTO dataRiwayatPendidikan 
-    //       (kodeJemaat, jenjangPendidikan, namaInstitusi, tahunLulus)
-    //       VALUES (?, ?, ?, ?)
-    //     `,
-    //       [
-    //         kodeJemaat,
-    //         jenjangPendidikan || "",
-    //         namaInstitusi || "",
-    //         tahunLulus || null
-    //       ]
-    //     );
-    //   }
-    // }
-
-    res.json({ message: "✅ Data jemaat berhasil ditambahkan tanpa sertifikat!" });
   } catch (err) {
-    console.error("❌ Error tambah jemaat:", err);
-    res.status(500).json({ message: "Gagal menambah jemaat", err });
-  }
-};
-
-
-export const tambahPendeta = (req, res) => {
-  try {
-    const {
-      namaLengkap,
-      kodeJemaat,
-      alamat,
-      tempatLahir,
-      tanggalLahir,
-      jenisKelamin,
-      agama,
-      golonganDarah,
-      nomorTelepon,
-      pepanthan,        
-      namaPelayanan,    
-      namaPekerjaan,    
-      jabatan: jabatanPekerjaan, 
-      jabatanPendeta, 
-    } = req.body;
-    
-    const finalJabatanPendeta = jabatanPendeta || req.body.jabatan; 
-
-    const foto = req.files?.foto?.[0] ? `uploads/fotoProfil/${req.files.foto[0].filename}` : null;
-    const sertifikatPendeta = req.files?.sertifikatPendeta?.[0]
-      ? `uploads/sertifikat/pendeta/${req.files.sertifikatPendeta[0].filename}`
-      : null;
-
-    // const pendidikanList = req.body.pendidikan ? JSON.parse(req.body.pendidikan) : [];
-    const pelayananList = req.body.dataPelayananList
-      ? JSON.parse(req.body.dataPelayananList)
-      : [];
-
-    // 🔍 Debug: Log semua data yang diterima
-    console.log("📥 Data diterima:");
-    console.log("- kodeJemaat:", kodeJemaat);
-    console.log("- Jabatan Pendeta:", finalJabatanPendeta);
-    console.log("- Sertifikat Pendeta:", sertifikatPendeta);
-    console.log("- Pelayanan List:", pelayananList);
-
-    // 1️⃣ Insert data jemaat dasar (Wajib)
-    const queryJemaat = `
-      INSERT INTO dataJemaat
-      (kodeJemaat, namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    db.query(
-        queryJemaat, 
-        [kodeJemaat, namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto], 
-        async (err) => {
-            if (err) {
-                console.error("❌ Error INSERT dataJemaat (Pendeta):", err);
-                return res.status(500).json({ message: "Gagal menambah data jemaat (kodeJemaat mungkin duplikat)", err });
-            }
-
-            console.log("✅ dataJemaat berhasil diinsert dengan kodeJemaat:", kodeJemaat);
-
-            const promisePool = db.promise();
-            const criticalInserts = [];
-
-            // === INSERT DATA PENDUKUNG (Menggunakan Promise.all) ===
-            
-            // Pepanthan
-            if (pepanthan) {
-                criticalInserts.push(
-                    promisePool.query(`INSERT INTO dataPepanthan (kodeJemaat, namaPepanthan) VALUES (?, ?)`, [kodeJemaat, pepanthan])
-                );
-            }
-            
-            // dataPelayanan
-            if (namaPelayanan) {
-                criticalInserts.push(
-                    promisePool.query(`INSERT INTO dataPelayanan (kodeJemaat, namaPelayanan) VALUES (?, ?)`, [kodeJemaat, namaPelayanan])
-                );
-            }
-
-            // Pekerjaan
-            if (namaPekerjaan || jabatanPekerjaan) {
-                criticalInserts.push(
-                    promisePool.query(`INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatan) VALUES (?, ?, ?)`, 
-                        [kodeJemaat, namaPekerjaan || null, jabatanPekerjaan || null])
-                );
-            }
-
-            // // Pendidikan List
-            // pendidikanList.forEach((p) => {
-            //     criticalInserts.push(
-            //         promisePool.query(
-            //             `INSERT INTO dataRiwayatPendidikan (kodeJemaat, jenjangPendidikan, namaInstitusi, tahunLulus) VALUES (?, ?, ?, ?)`,
-            //             [kodeJemaat, p.jenjangPendidikan, p.namaInstitusi, p.tahunLulus]
-            //         )
-            //     );
-            // });
-
-            // 2️⃣ Detail Pendeta (dataPendeta) 
-            // ✅ PERBAIKAN: kodePendeta AUTO_INCREMENT, nik sebagai FK
-            console.log("🔄 Mencoba insert dataPendeta...");
-            
-            const [pendetaResult] = await promisePool.query(
-                `INSERT INTO dataPendeta (kodeJemaat, jabatan, sertifikatPendeta) VALUES (?, ?, ?)`, 
-                [kodeJemaat, finalJabatanPendeta || null, sertifikatPendeta || null]
-            );
-            
-            // Ambil kodePendeta yang baru saja di-generate (AUTO_INCREMENT)
-            const kodePendeta = pendetaResult.insertId;
-            console.log("✅ dataPendeta berhasil diinsert dengan kodePendeta:", kodePendeta);
-
-            // 3️⃣ Riwayat Pelayanan Pendeta (dataRiwayatPendeta) 
-            // ✅ PERBAIKAN: Gunakan kodePendeta dari hasil insert sebelumnya
-            if (pelayananList.length > 0) {
-                console.log(`🔄 Mencoba insert ${pelayananList.length} riwayat pelayanan dengan kodePendeta: ${kodePendeta}...`);
-                
-                pelayananList.forEach((pel) => {
-                    criticalInserts.push(
-                        promisePool.query(
-                            `INSERT INTO dataRiwayatPendeta (kodePendeta, namaGereja, tahunMulai, tahunSelesai) VALUES (?, ?, ?, ?)`,
-                            [kodePendeta, pel.namaGereja || "", pel.tahunMulai || null, pel.tahunSelesai || null]
-                        )
-                    );
-                });
-            }
-            
-            try {
-                // Tunggu semua operasi selesai
-                const results = await Promise.all(criticalInserts);
-                
-                console.log("✅ Semua data berhasil diinsert:", results.length + 1, "operasi"); // +1 untuk dataPendeta
-                
-                res.json({ 
-                    message: "✅ Pendeta berhasil ditambahkan!",
-                    kodePendeta: kodePendeta,
-                    kodeJemaat: kodeJemaat
-                });
-                
-            } catch (subErr) {
-                // 🔥 Tangkap error SQL dan laporkan detailnya
-                console.error("❌ Error saat menjalankan INSERT Pendeta sekunder:", subErr);
-                console.error("SQL Error Code:", subErr.code);
-                console.error("SQL Message:", subErr.sqlMessage);
-                
-                res.status(500).json({ 
-                    message: "Gagal menyimpan data Pendeta. Detail error ada di log server.", 
-                    errorDetail: subErr.message,
-                    sqlError: subErr.sqlMessage 
-                });
-            }
-        }
-    );
-  } catch (error) {
-    console.error("❌ Error tambahPendeta (Catch Luar):", error);
-    res.status(500).json({ message: "❌ Terjadi kesalahan saat menambah pendeta" });
+    console.error("❌ Error tambahPendeta:", err);
+    res.status(500).json({ message: "Gagal menambah pendeta", error: err.message });
   }
 };

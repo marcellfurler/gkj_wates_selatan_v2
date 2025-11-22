@@ -23,7 +23,9 @@ const DetailListItem = ({ label, value }) => (
   </li>
 );
 
+// -----------------------------
 // Format tanggal
+// -----------------------------
 const formatTanggal = (tanggal) => {
   if (!tanggal) return "-";
   const options = { day: 'numeric', month: 'long', year: 'numeric' };
@@ -53,7 +55,9 @@ const DetailJemaat = ({ data }) => {
     { label: 'Alamat', value: data.alamat || '-' },
   ];
 
-  // Status Gerejawi dengan rincian sejajar
+  // -----------------------------
+  // Status Gerejawi & Pelayanan
+  // -----------------------------
   const dataGerejawi = [
     {
       label: 'Baptis',
@@ -77,18 +81,33 @@ const DetailJemaat = ({ data }) => {
           ]
         : ['Belum Nikah', ''],
     },
-    { label: 'Pelayanan', value: data.namaPelayanan || '-' },
+    {
+      label: 'Pelayanan',
+      value: data.namaPelayanan === 'Pendeta'
+        ? [
+            `Jabatan: ${data.dataPendeta?.jabatanPendeta || '-'}`,
+            ...(data.dataRiwayatPendeta?.length > 0
+              ? data.dataRiwayatPendeta.map(
+                  (r) =>
+                    `${r.namaGereja || '-'} | ${r.tahunMulai || '-'} - ${r.tahunSelesai || '-'}`
+                )
+              : ['Belum ada riwayat pelayanan'])
+          ]
+        : [data.namaPelayanan || '-']
+    },
     { label: 'Pepanthan', value: data.namaPepanthan || '-' },
   ];
 
-
+  // -----------------------------
+  // Hapus Jemaat
+  // -----------------------------
   const handleHapus = async (kodeJemaat) => {
     if (!window.confirm("Apakah Anda yakin ingin menghapus jemaat ini?")) return;
 
     try {
       const response = await axios.delete(`http://localhost:5000/api/jemaat/hapus/${kodeJemaat}`);
       alert(response.data.message);
-      navigate("/data"); // kembali ke daftar jemaat
+      navigate("/data");
     } catch (error) {
       console.error("Error hapus jemaat:", error);
       alert("Gagal menghapus jemaat!");
@@ -155,7 +174,7 @@ const DetailJemaat = ({ data }) => {
               />
 
               <h5 className="fw-bold mb-1" style={{ color: "#004d97" }}>{data.namaLengkap || 'Nama Jemaat'}</h5>
-              <p className="text-muted small mb-0" >{data.namaPelayanan || '-'}</p>
+              <p className="text-muted small mb-0">{data.namaPelayanan || '-'}</p>
               <p className="text-muted small">Pepanthan: {data.namaPepanthan || '-'}</p>
             </div>
 

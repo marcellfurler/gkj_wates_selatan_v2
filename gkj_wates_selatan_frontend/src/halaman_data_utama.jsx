@@ -93,23 +93,8 @@ const TabelDataJemaat = () => {
                     </td>
 
 
-                    <td>
-                      {data.namaPelayanan === 'Pendeta' ? (
-                        <Link
-                          // ✅ PERBAIKAN: Gunakan template literal untuk menambahkan ?nik=
-                          to={`/detailPendeta?kodeJemaat=${data.kodeJemaat}`} 
-                          // Hapus attribute 'state' karena kita menggunakan Query Parameter
-                          // state={{ nik: data.NIK, namaLengkap: data.namaLengkap }} 
-                          className="text-primary" 
-                          onClick={() => console.log("🔗 Mengirim kodeJemaat (Query Param):", data.kodeJemaat)}
-                        >
-                          {data.namaPelayanan} 
-                        </Link>
-                      ) : (
-                        // ...
-                        <span>{data.namaPelayanan || 'Jemaat'}</span>
-                      )}
-                    </td>
+                    <td>{data.namaPelayanan ?? 'Jemaat'}</td>
+
 
                     <td>
                       <Link
