@@ -424,8 +424,6 @@ const HalamanTambahDataBaru = () => {
                     <input type="date" name="tanggalSidi" className="form-control mb-2" value={formData.tanggalSidi} onChange={handleChange} />
                     <label className="form-label">Tempat Sidi</label>
                     <input type="text" name="tempatSidi" className="form-control mb-2" value={formData.tempatSidi} onChange={handleChange} />
-                    <label className="form-label">Gereja Asal</label>
-                    <input type="text" name="tempatSidi" className="form-control mb-2" value={formData.gerejaAsal} onChange={handleChange} />
                   </div>
                 )}
 
