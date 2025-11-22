@@ -2,38 +2,43 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencilAlt, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import logoGKJ from '../assets/logoGKJ.png';
 import { NavbarComponent } from '../components/NavbarComponent';
 import axios from 'axios';
-
-
-
 
 // -----------------------------
 // 🌟 DETAIL ITEM COMPONENT
 // -----------------------------
 const DetailListItem = ({ label, value }) => (
-  <li className="list-group-item d-flex align-items-center py-2 px-3 border-0 border-bottom">
+  <li className="list-group-item d-flex align-items-start py-2 px-3 border-0 border-bottom">
     <div className="fw-semibold text-muted" style={{ width: '150px', minWidth: '150px' }}>
       {label}
     </div>
     <div className="text-dark flex-grow-1 ps-2">
-      : {value}
+      {Array.isArray(value) ? (
+        value.map((v, i) => <div key={i}>{v}</div>)
+      ) : (
+        <div>{value}</div>
+      )}
     </div>
   </li>
 );
 
-
+// Format tanggal
+const formatTanggal = (tanggal) => {
+  if (!tanggal) return "-";
+  const options = { day: 'numeric', month: 'long', year: 'numeric' };
+  return new Date(tanggal).toLocaleDateString('id-ID', options);
+};
 
 // -----------------------------
 // 🌟 DETAIL PAGE COMPONENT
 // -----------------------------
 const DetailJemaat = ({ data }) => {
   const navigate = useNavigate();
+
   const dataPribadi = [
-    { label: 'kodeJemaat', value: data.kodeJemaat || '-' },
     { label: 'Nama Lengkap', value: data.namaLengkap || '-' },
-    { label: 'TTL', value: `${data.tempatLahir || '-'}, ${data.tanggalLahir || '-'}` },
+    { label: 'TTL', value: `${data.tempatLahir || '-'}, ${formatTanggal(data.tanggalLahir)}` },
     { label: 'Jenis Kelamin', value: data.jenisKelamin || '-' },
     { label: 'Agama', value: data.agama || '-' },
     { label: 'Golongan Darah', value: data.golonganDarah || '-' },
@@ -43,39 +48,52 @@ const DetailJemaat = ({ data }) => {
     { label: 'Jabatan', value: data.jabatan || '-' }
   ];
 
-  const dataPendidikan = data.pendidikanList?.length
-  ? data.pendidikanList.map((pend, index) => ({
-      label: `Pendidikan ${pend.jenjangPendidikan}` || `Pendidikan ${index + 1}`,
-      value: `${pend.namaInstitusi || '-'} - ${pend.tahunLulus || '-'}`
-    }))
-  : [{ label: 'Pendidikan', value: data.pendidikan || '-' }];
-
-
   const dataKontak = [
-    { label: 'No. Telepon', value: data.nomorTelepon || data.kontak || '-' },
+    { label: 'No. Telepon', value: data.nomorTelepon || '-' },
     { label: 'Alamat', value: data.alamat || '-' },
   ];
 
+  // Status Gerejawi dengan rincian sejajar
   const dataGerejawi = [
+    {
+      label: 'Baptis',
+      value: data.statusBaptis && data.statusBaptis !== '-' 
+        ? [data.statusBaptis, `${data.tempatBaptis || '-'}, ${formatTanggal(data.tanggalBaptis)}`]
+        : ['Belum Baptis', ''],
+    },
+    {
+      label: 'Sidi',
+      value: data.statusSidi && data.statusSidi !== '-' 
+        ? [data.statusSidi, `${data.tempatSidi || '-'}, ${formatTanggal(data.tanggalSidi)}`]
+        : ['Belum Sidi', ''],
+    },
+    {
+      label: 'Nikah',
+      value: data.statusNikah && data.statusNikah !== '-' 
+        ? [
+            data.statusNikah,
+            `${data.tempatNikah || '-'}, ${formatTanggal(data.tanggalNikah)}`,
+            data.namaPasangan ? `Nama Pasangan: ${data.namaPasangan} (${data.gerejaAsal || '-'})` : ''
+          ]
+        : ['Belum Nikah', ''],
+    },
+    { label: 'Pelayanan', value: data.namaPelayanan || '-' },
     { label: 'Pepanthan', value: data.namaPepanthan || '-' },
-    { label: 'Status Sidi', value: data.statusSidi || '-' },
-    { label: 'Status Baptis', value: data.statusBaptis || '-' },
-    { label: 'Status Nikah', value: data.statusNikah || '-' },
-    { label: 'Status Pelayanan', value: data.namaPelayanan || '-' },
   ];
 
-    const handleHapus = async (kodeJemaat) => {
-      if (!window.confirm("Apakah Anda yakin ingin menghapus jemaat ini?")) return;
 
-      try {
-        const response = await axios.delete(`http://localhost:5000/api/jemaat/hapus/${kodeJemaat}`);
-        alert(response.data.message);
-        navigate("/data"); // ✅ kembali ke daftar jemaat
-      } catch (error) {
-        console.error("Error hapus jemaat:", error);
-        alert("Gagal menghapus jemaat!");
-      }
-    };
+  const handleHapus = async (kodeJemaat) => {
+    if (!window.confirm("Apakah Anda yakin ingin menghapus jemaat ini?")) return;
+
+    try {
+      const response = await axios.delete(`http://localhost:5000/api/jemaat/hapus/${kodeJemaat}`);
+      alert(response.data.message);
+      navigate("/data"); // kembali ke daftar jemaat
+    } catch (error) {
+      console.error("Error hapus jemaat:", error);
+      alert("Gagal menghapus jemaat!");
+    }
+  };
 
   return (
     <div className="container mt-4 mb-5">
@@ -91,7 +109,6 @@ const DetailJemaat = ({ data }) => {
             padding: '0 1rem',
           }}
         >
-          {/* Tombol Kembali di kiri */}
           <Link
             to="/data"
             className="btn btn-light btn-sm fw-bold position-absolute start-0 ms-3"
@@ -101,32 +118,26 @@ const DetailJemaat = ({ data }) => {
             <FontAwesomeIcon icon={faArrowLeft} className="me-1" /> Kembali
           </Link>
 
-          {/* Judul Tengah */}
           <h5 className="mb-0 fw-bold text-center flex-grow-1">BIODATA JEMAAT</h5>
 
-          {/* Tombol Edit & Hapus di kanan, berdampingan */}
-          <div className="position-absolute end-0 me-3 d-flex gap-2"> {/* 💡 TAMBAHKAN d-flex dan gap-2 */}
-              {/* TOMBOL EDIT */}
-              <Link
-                  to="/edit"
-                  state={{ data }}
-                  // Kelas sudah benar: btn btn-light btn-sm fw-bold
-                  className="btn btn-light btn-sm fw-bold" 
-                  style={{ color: "#004d97" }}
-                  title="Edit Data"
-              >
-                  <FontAwesomeIcon icon={faPencilAlt} className="me-1" /> Edit
-              </Link>
+          <div className="position-absolute end-0 me-3 d-flex gap-2">
+            <Link
+              to="/edit"
+              state={{ data }}
+              className="btn btn-light btn-sm fw-bold" 
+              style={{ color: "#004d97" }}
+              title="Edit Data"
+            >
+              <FontAwesomeIcon icon={faPencilAlt} className="me-1" /> Edit
+            </Link>
 
-              {/* TOMBOL HAPUS */}
-              <button
-                  onClick={() => handleHapus(data.kodeJemaat)}
-                  // Kelas sudah benar: btn btn-danger btn-sm fw-bold
-                  className="btn btn-danger btn-sm fw-bold" 
-                  title="Hapus Data"
-              >
-                  Hapus
-              </button>
+            <button
+              onClick={() => handleHapus(data.kodeJemaat)}
+              className="btn btn-danger btn-sm fw-bold" 
+              title="Hapus Data"
+            >
+              Hapus
+            </button>
           </div>
         </div>
 
@@ -143,7 +154,7 @@ const DetailJemaat = ({ data }) => {
                 style={{ width: '150px', height: '150px', objectFit: 'cover' }}
               />
 
-              <h5 className="fw-bold  mb-1" style={{ color: "#004d97" }}>{data.namaLengkap || 'Nama Jemaat'}</h5>
+              <h5 className="fw-bold mb-1" style={{ color: "#004d97" }}>{data.namaLengkap || 'Nama Jemaat'}</h5>
               <p className="text-muted small mb-0" >{data.namaPelayanan || '-'}</p>
               <p className="text-muted small">Pepanthan: {data.namaPepanthan || '-'}</p>
             </div>
@@ -155,11 +166,6 @@ const DetailJemaat = ({ data }) => {
                 {dataPribadi.map((item, index) => (
                   <DetailListItem key={`pribadi-${index}`} label={item.label} value={item.value} />
                 ))}
-                <li className="list-group-item bg-light fw-bold py-2">Pendidikan</li>
-                {dataPendidikan.map((item, index) => (
-                  <DetailListItem key={`pendidikan-${index}`} label={item.label} value={item.value} />
-                ))}
-
 
                 <li className="list-group-item bg-light fw-bold py-2">Kontak & Alamat</li>
                 {dataKontak.map((item, index) => (
@@ -170,7 +176,6 @@ const DetailJemaat = ({ data }) => {
                 {dataGerejawi.map((item, index) => (
                   <DetailListItem key={`gereja-${index}`} label={item.label} value={item.value} />
                 ))}
-
               </ul>
             </div>
           </div>

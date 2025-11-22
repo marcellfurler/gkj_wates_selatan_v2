@@ -41,11 +41,11 @@ const EditJemaat = () => {
     }
   );
 
-  const [pendidikanList, setPendidikanList] = useState(
-    state?.data?.pendidikanList || [
-      { jenjangPendidikan: "", namaInstitusi: "", tahunLulus: "" },
-    ]
-  );
+  // const [pendidikanList, setPendidikanList] = useState(
+  //   state?.data?.pendidikanList || [
+  //     { jenjangPendidikan: "", namaInstitusi: "", tahunLulus: "" },
+  //   ]
+  // );
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [statusFileMap, setStatusFileMap] = useState({}); // untuk upload file baru per status
@@ -62,25 +62,25 @@ const EditJemaat = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Pendidikan dinamis
-  const handlePendidikanChange = (index, field, value) => {
-    const newList = [...pendidikanList];
-    newList[index][field] = value;
-    setPendidikanList(newList);
-  };
+  // // Pendidikan dinamis
+  // const handlePendidikanChange = (index, field, value) => {
+  //   const newList = [...pendidikanList];
+  //   newList[index][field] = value;
+  //   setPendidikanList(newList);
+  // };
 
-  const addPendidikan = () => {
-    setPendidikanList([
-      ...pendidikanList,
-      { jenjangPendidikan: "", namaInstitusi: "", tahunLulus: "" },
-    ]);
-  };
+  // const addPendidikan = () => {
+  //   setPendidikanList([
+  //     ...pendidikanList,
+  //     { jenjangPendidikan: "", namaInstitusi: "", tahunLulus: "" },
+  //   ]);
+  // };
 
-  const removePendidikan = (index) => {
-    const newList = [...pendidikanList];
-    newList.splice(index, 1);
-    setPendidikanList(newList);
-  };
+  // const removePendidikan = (index) => {
+  //   const newList = [...pendidikanList];
+  //   newList.splice(index, 1);
+  //   setPendidikanList(newList);
+  // };
 
   // Upload file foto
   const handleFileChange = (e) => {
@@ -103,20 +103,49 @@ const EditJemaat = () => {
   };
 
   // Submit form
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const kodeJemaat = formData.kodeJemaat;
-    const formDataToSend = new FormData();
+// Submit form
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const kodeJemaat = formData.kodeJemaat;
 
-    // Append semua field jemaat
-    for (const key in formData) {
-      if (!key.startsWith("sertifikat")) {
-        formDataToSend.append(key, formData[key]);
-      }
+  // Buat FormData untuk dikirim
+  const fd = new FormData();
+
+  // Append semua field kecuali foto
+  for (const key in formData) {
+    if (key === "foto") continue; // foto ditangani terpisah
+    fd.append(key, formData[key] ?? "");
+  }
+
+  // Append foto jika ada
+  if (formData.foto) {
+    fd.append("foto", formData.foto);
+  }
+
+  try {
+    const res = await fetch(`http://localhost:5000/api/jemaat/${kodeJemaat}`, {
+      method: "PUT",
+      body: fd,
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("✅ Data jemaat berhasil diperbarui!");
+      navigate(-1);
+    } else {
+      alert("❌ " + (data.message || "Gagal memperbarui data jemaat."));
     }
+  } catch (err) {
+    console.error("❌ Error saat update:", err);
+  }
+
+
+
+
 
     // Append pendidikanList
-    formDataToSend.append("pendidikanList", JSON.stringify(pendidikanList));
+    // formDataToSend.append("pendidikanList", JSON.stringify(pendidikanList));
 
     // Sertifikat baru untuk status
     Object.keys(statusFileMap).forEach((status) => {
@@ -229,7 +258,7 @@ const EditJemaat = () => {
                 <input type="file" accept="image/*" className="form-control" onChange={(e) => setFormData({ ...formData, foto: e.target.files[0] })} />
               </div>
 
-              {/* Pendidikan Dinamis */}
+              {/* Pendidikan Dinamis
               <div className="col-12 mt-4">
                 <hr />
                 <h6 className="fw-bold text-primary mb-3">Pendidikan</h6>
@@ -257,7 +286,7 @@ const EditJemaat = () => {
                 <button type="button" className="btn btn-sm btn-primary mt-2" onClick={addPendidikan}>
                   + Tambah Pendidikan
                 </button>
-              </div>
+              </div> */}
 
               {/* Status Gerejawi */}
               <div className="col-12 mt-4">
@@ -276,14 +305,19 @@ const EditJemaat = () => {
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-bold">Status Pelayanan</label>
-                      <select name={`namaPelayanan`} value={formData[`namaPelayanan`]} onChange={handleChange} className="form-select">
-                        <option value="">--Pilih--</option>
-                        <option value="Jemaat">Jemaat</option>
-                        <option value="Pendeta">Pendeta</option>
-                        <option value="Majelis">Majelis</option>
-                        <option value="Koordinator Pelayanan">Koordinator Pelayanan</option>
-                        <option value="Meninggal">Meninggal</option>
-                      </select>
+                    <select 
+                      name="namaPelayanan" 
+                      value={formData.namaPelayanan || ""} 
+                      onChange={handleChange} 
+                      className="form-select"
+                    >
+                      <option value="">--Pilih--</option>
+                      <option value="Jemaat">Jemaat</option>
+                      <option value="Pendeta">Pendeta</option>
+                      <option value="Majelis">Majelis</option>
+                      <option value="Koordinator Pelayanan">Koordinator Pelayanan</option>
+                      <option value="Meninggal">Meninggal</option>
+                    </select>
                   </div>
                 </div>
 
@@ -291,21 +325,116 @@ const EditJemaat = () => {
                 <div className="row">
                   {["Baptis", "Sidi", "Nikah"].map((status, i) => (
                     <div className="col-md-4" key={i}>
+
+                      {/* LABEL */}
                       <label className="form-label fw-bold">Status {status}</label>
-                      <select name={`status${status}`} value={formData[`status${status}`]} onChange={handleChange} className="form-select">
-                        <option value="">{status === "Baptis" ? "Belum Baptis" : status === "Sidi" ? "Belum Sidi" : "Belum Nikah"}</option>
+
+                      {/* DROPDOWN STATUS */}
+                      <select
+                        name={`status${status}`}
+                        value={formData[`status${status}`] || ""}
+                        onChange={handleChange}
+                        className="form-select"
+                      >
+                        <option value="">
+                          {status === "Baptis"
+                            ? "Belum Baptis"
+                            : status === "Sidi"
+                            ? "Belum Sidi"
+                            : "Belum Nikah"}
+                        </option>
                         <option value={status}>{status}</option>
                       </select>
 
+                      {/* FORM DETAIL - MUNCUL JIKA STATUS DIPILIH */}
                       {formData[`status${status}`] === status && (
-                        <div className="mt-2">
-                          <label className="form-label fw-bold">Upload Sertifikat {status}</label>
-                          <input type="file" accept="image/*,application/pdf" className="form-control" onChange={(e) => handleStatusFileChange(status.toLowerCase(), e.target.files[0])} />
+                        <div className="mt-3">
 
-                          {formData[`sertifikat${status}`] && (
-                            <button type="button" className="btn btn-sm btn-danger mt-2" onClick={() => handleDeleteStatus(status)}>
-                              Hapus Sertifikat {status}
-                            </button>
+                          {/* === BAPTIS === */}
+                          {status === "Baptis" && (
+                            <>
+                              <label className="form-label fw-bold">Tanggal Baptis</label>
+                              <input
+                                type="date"
+                                name="tanggalBaptis"
+                                value={formData.tanggalBaptis || ""}
+                                onChange={handleChange}
+                                className="form-control"
+                              />
+
+                              <label className="form-label fw-bold mt-2">Tempat Baptis</label>
+                              <input
+                                type="text"
+                                name="tempatBaptis"
+                                value={formData.tempatBaptis || ""}
+                                onChange={handleChange}
+                                className="form-control"
+                              />
+                            </>
+                          )}
+
+                          {/* === SIDI === */}
+                          {status === "Sidi" && (
+                            <>
+                              <label className="form-label fw-bold">Tanggal Sidi</label>
+                              <input
+                                type="date"
+                                name="tanggalSidi"
+                                value={formData.tanggalSidi || ""}
+                                onChange={handleChange}
+                                className="form-control"
+                              />
+
+                              <label className="form-label fw-bold mt-2">Tempat Sidi</label>
+                              <input
+                                type="text"
+                                name="tempatSidi"
+                                value={formData.tempatSidi || ""}
+                                onChange={handleChange}
+                                className="form-control"
+                              />
+                            </>
+                          )}
+
+                          {/* === NIKAH === */}
+                          {status === "Nikah" && (
+                            <>
+                              <label className="form-label fw-bold">Tanggal Nikah</label>
+                              <input
+                                type="date"
+                                name="tanggalNikah"
+                                value={formData.tanggalNikah || ""}
+                                onChange={handleChange}
+                                className="form-control"
+                              />
+
+                              <label className="form-label fw-bold mt-2">Tempat Nikah</label>
+                              <input
+                                type="text"
+                                name="tempatNikah"
+                                value={formData.tempatNikah || ""}
+                                onChange={handleChange}
+                                className="form-control"
+                              />
+
+                              <label className="form-label fw-bold mt-2">Nama Pasangan</label>
+                              <input
+                                type="text"
+                                name="namaPasangan"
+                                value={formData.namaPasangan || ""}
+                                onChange={handleChange}
+                                className="form-control"
+                              />
+
+                              <label className="form-label fw-bold mt-2">Gereja Asal</label>
+                              <input
+                                type="text"
+                                name="gerejaAsal"
+                                value={formData.gerejaAsal || ""}
+                                onChange={handleChange}
+                                className="form-control"
+                              />
+                            </>
                           )}
                         </div>
                       )}

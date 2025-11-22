@@ -19,30 +19,10 @@ function ensureFolderExists(folder) {
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     let folder = "";
-
-    if (file.fieldname === "foto") {
-      folder = path.join(__dirname, "../uploads/fotoProfil");
-    } 
-    else if (file.fieldname === "sertifikatNikah") {
-      folder = path.join(__dirname, "../uploads/sertifikat/nikah");
-    } 
-    else if (file.fieldname === "sertifikatSidi") {
-      folder = path.join(__dirname, "../uploads/sertifikat/sidi");
-    } 
-    else if (file.fieldname === "sertifikatBaptis") {
-      folder = path.join(__dirname, "../uploads/sertifikat/baptis");
-    } 
-    else if (file.fieldname === "sertifikatPendeta") {
-      folder = path.join(__dirname, "../uploads/sertifikat/pendeta");
-    }
-    else if (file.fieldname === "sertifikat") {
-      folder = path.join(__dirname, "../uploads/sertifikat/update");
-    }
-
+    if (file.fieldname === "foto") folder = path.join(__dirname, "../uploads/fotoProfil");
     ensureFolderExists(folder);
     cb(null, folder);
   },
-
   filename: (req, file, cb) => {
     const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(null, unique + path.extname(file.originalname));
@@ -58,45 +38,13 @@ const upload = multer({ storage });
 // GET semua jemaat
 router.get("/", dataJemaatController.getAllJemaat);
 
-// POST tambah jemaat biasa
-router.post(
-  "/",
-  upload.fields([
-    { name: "foto", maxCount: 1 },
-    { name: "sertifikatNikah", maxCount: 1 },
-    { name: "sertifikatSidi", maxCount: 1 },
-    { name: "sertifikatBaptis", maxCount: 1 },
-    { name: "sertifikatPendeta", maxCount: 1 }, // tetap ada, tapi tidak digunakan di tambahJemaat
-  ]),
-  dataJemaatController.tambahJemaat
-);
+// POST tambah jemaat (bisa tambah foto)
+router.post("/", upload.single("foto"), dataJemaatController.tambahJemaat);
 
-// PUT update jemaat
-router.put(
-  "/:kodeJemaat",
-  upload.fields([
-    { name: "foto", maxCount: 1 },
-    { name: "sertifikatNikah", maxCount: 1 },
-    { name: "sertifikatSidi", maxCount: 1 },
-    { name: "sertifikatBaptis", maxCount: 1 },
-    { name: "sertifikatPendeta", maxCount: 1 },
-  ]),
-  dataJemaatController.updateJemaat
-);
+// PUT update jemaat (opsional ganti foto)
+router.put("/:kodeJemaat", upload.single("foto"), dataJemaatController.updateJemaat);
 
-// =========================
-// TAMBAHAN: ROUTE UNTUK PENDETA
-// =========================
-router.post(
-  "/pendeta",
-  upload.fields([
-    { name: "foto", maxCount: 1 },
-    { name: "sertifikatPendeta", maxCount: 1 },
-  ]),
-  dataJemaatController.tambahPendeta
-);
-
-// Hapus jemaat
+// DELETE jemaat
 router.delete("/hapus/:kodeJemaat", dataJemaatController.hapusJemaat);
 
 export default router;

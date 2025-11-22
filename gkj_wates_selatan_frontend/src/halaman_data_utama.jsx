@@ -80,52 +80,16 @@ const TabelDataJemaat = () => {
                     <td>{data.namaPepanthan || '-'}</td>
 
                     <td>
-                      {data.statusSidi === 'Sidi' ? (
-                        <Link 
-                          to="/sertifikat-sidi" 
-                          state={{ kodeJemaat: data.kodeJemaat, Lengkap: data.namaLengkap }} // ✅ kirim 'nik' kecil
-                          className="text-primary"
-                          onClick={() => console.log("🔗 Mengirim kodeJemaat (Sidi):", data.kodeJemaat)}
-                        >
-                          {data.statusSidi}
-                        </Link>
-                      ) : (
-                        <span>{data.statusSidi || 'Belum Sidi'}</span>
-                      )}
+                      {data.statusSidi === 'Sidi' ? 'Sidi' : 'Belum Sidi'}
                     </td>
 
 
                     <td>
-                      {data.statusBaptis === 'Baptis' ? (
-                        <Link 
-                          to="/sertifikat-baptis"
-                          state={{ kodeJemaat: data.kodeJemaat, namaLengkap: data.namaLengkap }} 
-                          className="text-primary"
-                          onClick={() => console.log("🔗 Mengirim kodeJemaat:", data.kodeJemaat)}
-                        >
-                          {data.statusBaptis}
-                        </Link>
-                      ) : (
-                        <span>{data.statusBaptis || 'Belum Baptis'}</span>
-                      )}
+                      {data.statusBaptis === 'Baptis' ? 'Baptis' : 'Belum Baptis'}
                     </td>
 
                     <td>
-                      {data.statusNikah === 'Nikah' ? (
-                      <Link 
-                        to="/sertifikat-nikah" 
-                        state={{ kodeJemaat: data.kodeJemaat, namaLengkap: data.namaLengkap }} 
-                        className="text-primary"
-                        onClick={() => console.log("🔗 Mengirim kodeJemaat:", data.kodeJemaat)}
-                      >
-                        {data.statusNikah}
-                      </Link>
-
-
-
-                      ) : (
-                        <span>{data.statusNikah || 'Belum Nikah'}</span>
-                      )}
+                      {data.statusNikah === 'Nikah' ? 'Nikah' : 'Belum Nikah'}
                     </td>
 
 

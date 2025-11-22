@@ -149,7 +149,7 @@ const HalamanDetailPendeta = () => {
     const fotoUrl = foto ? `http://localhost:5000/${foto}` : logoGKJ;
 
     const dataPribadi = [
-        { label: 'kodeJemaat', value: pendetaData.kodeJemaat || '-' },
+        // { label: 'kodeJemaat', value: pendetaData.kodeJemaat || '-' },
         { label: 'Nama Lengkap', value: namaLengkap || '-' },
         { label: 'TTL', value: `${tempatLahir || '-'}, ${formatTanggal(tanggalLahir)}` },
         { label: 'Jenis Kelamin', value: jenisKelamin || '-' },
