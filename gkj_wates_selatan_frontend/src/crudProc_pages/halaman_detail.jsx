@@ -47,7 +47,7 @@ const DetailJemaat = ({ data }) => {
     { label: 'Warga Negara', value: data.wargaNegara || '-' },
     { label: 'Alamat', value: data.alamat || '-' },
     { label: 'Nama Pekerjaan', value: data.namaPekerjaan || '-' },
-    { label: 'Jabatan', value: data.jabatan || '-' }
+    { label: 'Jabatan', value: data.jabatanKerja || '-' }
   ];
 
   const dataKontak = [
@@ -85,7 +85,7 @@ const DetailJemaat = ({ data }) => {
       label: 'Pelayanan',
       value: data.namaPelayanan === 'Pendeta'
         ? [
-            `Jabatan: ${data.dataPendeta?.jabatanPendeta || '-'}`,
+            `Jabatan: ${data.dataPendeta?.jabatan || '-'}`,
             ...(data.dataRiwayatPendeta?.length > 0
               ? data.dataRiwayatPendeta.map(
                   (r) =>

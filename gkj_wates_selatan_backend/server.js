@@ -6,9 +6,9 @@ import bodyParser from "body-parser";
 
 // Import semua routes
 import dataJemaatRoutes from "./routes/dataJemaatRoutes.js";
-import dataNikahRoutes from "./routes/dataNikahRoutes.js";
-import dataSidiRoutes from "./routes/dataSidiRoutes.js";
-import dataBaptisRoutes from "./routes/dataBaptisRoutes.js";
+// import dataNikahRoutes from "./routes/dataNikahRoutes.js";
+// import dataSidiRoutes from "./routes/dataSidiRoutes.js";
+// import dataBaptisRoutes from "./routes/dataBaptisRoutes.js";
 import dataPendetaRoutes from "./routes/dataPendetaRoutes.js"; // ✅ IMPOR ROUTE PENDETA
 import suratRoutes from "./routes/suratRoutes.js";
 
@@ -36,9 +36,6 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ✅ Routes utama
 // ================================
 app.use("/api/jemaat", dataJemaatRoutes);
-app.use("/api/nikah", dataNikahRoutes);
-app.use("/api/sidi", dataSidiRoutes);
-app.use("/api/baptis", dataBaptisRoutes);
 app.use("/api/pendeta", dataPendetaRoutes); // ✅ GUNAKAN ROUTE PENDETA
 app.use("/api/surat", suratRoutes);
 

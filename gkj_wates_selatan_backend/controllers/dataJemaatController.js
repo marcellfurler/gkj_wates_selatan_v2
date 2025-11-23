@@ -40,7 +40,7 @@ export const getAllJemaat = (req, res) => {
       l.namaPelayanan,
 
       pe.namaPekerjaan,
-      pe.jabatan,
+      pe.jabatanKerja,
 
 
       drp.namaGereja,
@@ -155,7 +155,7 @@ export const updateJemaat = async (req, res) => {
     // Ambil body
     let {
       namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah,
-      wargaNegara, nomorTelepon, alamat, namaPepanthan, namaPekerjaan, jabatan,
+      wargaNegara, nomorTelepon, alamat, namaPepanthan, namaPekerjaan, jabatanKerja,
       namaPelayanan, statusBaptis, tanggalBaptis, tempatBaptis,
       statusSidi, tanggalSidi, tempatSidi,
       statusNikah, tanggalNikah, tempatNikah, namaPasangan, gerejaAsal
@@ -228,17 +228,17 @@ export const updateJemaat = async (req, res) => {
     // =========================
     // UPDATE/INSERT Pekerjaan
     // =========================
-    if (namaPekerjaan || jabatan) {
+    if (namaPekerjaan || jabatanKerja) {
       const [job] = await promisePool.query(`SELECT * FROM dataPekerjaan WHERE kodeJemaat=?`, [kodeJemaat]);
       if (job.length) {
         await promisePool.query(
-          `UPDATE dataPekerjaan SET namaPekerjaan=?, jabatan=? WHERE kodeJemaat=?`,
-          [namaPekerjaan || "", jabatan || "", kodeJemaat]
+          `UPDATE dataPekerjaan SET namaPekerjaan=?, jabatanKerja=? WHERE kodeJemaat=?`,
+          [namaPekerjaan || "", jabatanKerja || "", kodeJemaat]
         );
       } else {
         await promisePool.query(
-          `INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatan) VALUES (?, ?, ?)`,
-          [kodeJemaat, namaPekerjaan || "", jabatan || ""]
+          `INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatanKerja) VALUES (?, ?, ?)`,
+          [kodeJemaat, namaPekerjaan || "", jabatanKerja || ""]
         );
       }
     }
@@ -391,7 +391,7 @@ export const tambahJemaat = async (req, res) => {
       tanggalBaptis,
       tempatBaptis,
       namaPekerjaan,
-      jabatan
+      jabatanKerja
     } = req.body;
 
     // Foto: pakai file multer atau default
@@ -475,11 +475,11 @@ export const tambahJemaat = async (req, res) => {
     }
 
     // Pekerjaan
-    if ((namaPekerjaan && namaPekerjaan !== "") || (jabatan && jabatan !== "")) {
+    if ((namaPekerjaan && namaPekerjaan !== "") || (jabatanKerja && jabatanKerja !== "")) {
       inserts.push(
         promisePool.query(
-          `INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatan) VALUES (?, ?, ?)`,
-          [kodeJemaat, namaPekerjaan || null, jabatan || null]
+          `INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatanKerja) VALUES (?, ?, ?)`,
+          [kodeJemaat, namaPekerjaan || null, jabatanKerja || null]
         )
       );
     }
@@ -506,90 +506,90 @@ export const tambahJemaat = async (req, res) => {
 
 
 
-// ===================================================
-// TAMBAH PENDETA TANPA SERTIFIKAT
-// ===================================================
-export const tambahPendeta = async (req, res) => {
-  try {
-    const {
-      kodeJemaat,
-      namaLengkap,
-      tempatLahir,
-      tanggalLahir,
-      jenisKelamin,
-      agama,
-      golonganDarah,
-      nomorTelepon,
-      alamat,
-      pepanthan,
-      namaPelayanan,
-      namaPekerjaan,
-      jabatan: jabatanPekerjaan,
-      jabatanPendeta,
-      dataPelayananList // JSON string dari frontend
-    } = req.body;
+// // ===================================================
+// // TAMBAH PENDETA TANPA SERTIFIKAT
+// // ===================================================
+// export const tambahPendeta = async (req, res) => {
+//   try {
+//     const {
+//       kodeJemaat,
+//       namaLengkap,
+//       tempatLahir,
+//       tanggalLahir,
+//       jenisKelamin,
+//       agama,
+//       golonganDarah,
+//       nomorTelepon,
+//       alamat,
+//       pepanthan,
+//       namaPelayanan,
+//       namaPekerjaan,
+//       jabatan: jabatanPekerjaan,
+//       jabatanPendeta,
+//       dataPelayananList // JSON string dari frontend
+//     } = req.body;
 
-    const finalJabatanPendeta = jabatanPendeta || null;
+//     const finalJabatanPendeta = jabatanPendeta || null;
 
-    const foto = req.files?.foto?.[0]
-      ? `uploads/fotoProfil/${req.files.foto[0].filename}`
-      : null;
+//     const foto = req.files?.foto?.[0]
+//       ? `uploads/fotoProfil/${req.files.foto[0].filename}`
+//       : null;
 
-    const promisePool = db.promise();
+//     const promisePool = db.promise();
 
-    // Parse list riwayat pelayanan pendeta
-    let pelayananList = [];
-    if (dataPelayananList) {
-      try {
-        pelayananList = JSON.parse(dataPelayananList);
-      } catch {
-        pelayananList = [];
-      }
-    }
+//     // Parse list riwayat pelayanan pendeta
+//     let pelayananList = [];
+//     if (dataPelayananList) {
+//       try {
+//         pelayananList = JSON.parse(dataPelayananList);
+//       } catch {
+//         pelayananList = [];
+//       }
+//     }
 
-    // 1️⃣ Insert data jemaat utama
-    await promisePool.query(
-      `INSERT INTO dataJemaat
-      ( namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto]
-    );
+//     // 1️⃣ Insert data jemaat utama
+//     await promisePool.query(
+//       `INSERT INTO dataJemaat
+//       ( namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto)
+//       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+//       [namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto]
+//     );
 
-    // 2️⃣ Insert data pendukung jemaat
-    const inserts = [];
-    if (pepanthan) inserts.push(promisePool.query(`INSERT INTO dataPepanthan (kodeJemaat, namaPepanthan) VALUES (?, ?)`, [kodeJemaat, pepanthan]));
-    if (namaPelayanan) inserts.push(promisePool.query(`INSERT INTO dataPelayanan (kodeJemaat, namaPelayanan) VALUES (?, ?)`, [kodeJemaat, namaPelayanan]));
-    if (namaPekerjaan || jabatanPekerjaan) inserts.push(promisePool.query(`INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatan) VALUES (?, ?, ?)`, [kodeJemaat, namaPekerjaan || null, jabatanPekerjaan || null]));
+//     // 2️⃣ Insert data pendukung jemaat
+//     const inserts = [];
+//     if (pepanthan) inserts.push(promisePool.query(`INSERT INTO dataPepanthan (kodeJemaat, namaPepanthan) VALUES (?, ?)`, [kodeJemaat, pepanthan]));
+//     if (namaPelayanan) inserts.push(promisePool.query(`INSERT INTO dataPelayanan (kodeJemaat, namaPelayanan) VALUES (?, ?)`, [kodeJemaat, namaPelayanan]));
+//     if (namaPekerjaan || jabatanPekerjaan) inserts.push(promisePool.query(`INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatan) VALUES (?, ?, ?)`, [kodeJemaat, namaPekerjaan || null, jabatanPekerjaan || null]));
 
-    // 3️⃣ Insert dataPendeta
-    const [pendetaResult] = await promisePool.query(
-      `INSERT INTO dataPendeta (kodeJemaat, jabatan) VALUES (?, ?)`,
-      [kodeJemaat, finalJabatanPendeta]
-    );
-    const kodePendeta = pendetaResult.insertId;
+//     // 3️⃣ Insert dataPendeta
+//     const [pendetaResult] = await promisePool.query(
+//       `INSERT INTO dataPendeta (kodeJemaat, jabatan) VALUES (?, ?)`,
+//       [kodeJemaat, finalJabatanPendeta]
+//     );
+//     const kodePendeta = pendetaResult.insertId;
 
-    // 4️⃣ Insert riwayat pelayanan pendeta
-    if (pelayananList.length > 0) {
-      const pelayananPromises = pelayananList.map(p =>
-        promisePool.query(
-          `INSERT INTO dataRiwayatPendeta (kodePendeta, namaGereja, tahunMulai, tahunSelesai) VALUES (?, ?, ?, ?)`,
-          [kodePendeta, p.namaGereja || "", p.tahunMulai || null, p.tahunSelesai || null]
-        )
-      );
-      await Promise.all(pelayananPromises);
-    }
+//     // 4️⃣ Insert riwayat pelayanan pendeta
+//     if (pelayananList.length > 0) {
+//       const pelayananPromises = pelayananList.map(p =>
+//         promisePool.query(
+//           `INSERT INTO dataRiwayatPendeta (kodePendeta, namaGereja, tahunMulai, tahunSelesai) VALUES (?, ?, ?, ?)`,
+//           [kodePendeta, p.namaGereja || "", p.tahunMulai || null, p.tahunSelesai || null]
+//         )
+//       );
+//       await Promise.all(pelayananPromises);
+//     }
 
-    // Tunggu semua inserts selesai
-    await Promise.all(inserts);
+//     // Tunggu semua inserts selesai
+//     await Promise.all(inserts);
 
-    res.json({
-      message: "✅ Pendeta berhasil ditambahkan!",
-      kodePendeta,
-      kodeJemaat
-    });
+//     res.json({
+//       message: "✅ Pendeta berhasil ditambahkan!",
+//       kodePendeta,
+//       kodeJemaat
+//     });
 
-  } catch (err) {
-    console.error("❌ Error tambahPendeta:", err);
-    res.status(500).json({ message: "Gagal menambah pendeta", error: err.message });
-  }
-};
+//   } catch (err) {
+//     console.error("❌ Error tambahPendeta:", err);
+//     res.status(500).json({ message: "Gagal menambah pendeta", error: err.message });
+//   }
+// };

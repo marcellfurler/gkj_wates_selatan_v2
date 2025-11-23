@@ -44,6 +44,11 @@ router.post("/", upload.single("foto"), dataJemaatController.tambahJemaat);
 // PUT update jemaat (opsional ganti foto)
 router.put("/:kodeJemaat", upload.single("foto"), dataJemaatController.updateJemaat);
 
+// router.post("/pendeta", upload.single("foto"), dataJemaatController.tambahPendeta);
+// router.post("/pendeta", upload.single("foto"), dataJemaatController.tambahPendeta);
+
+
+
 // DELETE jemaat
 router.delete("/hapus/:kodeJemaat", dataJemaatController.hapusJemaat);
 

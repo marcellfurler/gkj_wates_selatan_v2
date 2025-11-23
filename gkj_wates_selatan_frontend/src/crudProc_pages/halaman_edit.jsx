@@ -33,7 +33,7 @@ const EditJemaat = () => {
       statusNikah: "",
       namaPelayanan: "",
       namaPekerjaan: "",
-      jabatan: "",
+      jabatanKerja: "",
       foto: "",
       sertifikatBaptis: state?.data?.sertifikatBaptis || null,
       sertifikatSidi: state?.data?.sertifikatSidi || null,
@@ -231,7 +231,7 @@ const handleSubmit = async (e) => {
                 <input type="text" name="namaPekerjaan" value={formData.namaPekerjaan || ""} onChange={handleChange} className="form-control" />
 
                 <label className="form-label fw-bold mt-3">Jabatan</label>
-                <input type="text" name="jabatan" value={formData.jabatan || ""} onChange={handleChange} className="form-control" />
+                <input type="text" name="jabatanKerja" value={formData.jabatanKerja || ""} onChange={handleChange} className="form-control" />
               </div>
 
               {/* Kolom kanan */}

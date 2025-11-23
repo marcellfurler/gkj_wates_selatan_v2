@@ -1,94 +1,167 @@
-import { db } from "../config/db.js"; 
+// controllers/dataPendetaController.js
+import { db } from "../config/db.js";
 
-/**
- * Mengambil detail LENGKAP Pendeta (gabungan dataJemaat + dataPendeta + dataRiwayatPendeta) berdasarkan NIK.
- */
-export const getPendetaDetailBykodeJemaat = (req, res) => {
-    // ✅ Ambil NIK dari query parameter ATAU route parameter
-    const kodeJemaat = req.query.kodeJemaat || req.params.kodeJemaat;
+// ===================================================
+// TAMBAH PENDETA
+// ===================================================
+export const tambahPendeta = async (req, res) => {
+  try {
+    console.log("FILES:", req.files);
+    console.log("BODY:", req.body);
 
-    if (!kodeJemaat) {
-        return res.status(400).json({ 
-            message: "NIK tidak ditemukan. Gunakan ?kodeJemaat=xxx atau /:kodeJemaat" 
-        });
-    }
+    const promisePool = db.promise();
 
-    console.log("🔍 Mengambil detail Pendeta dengan kodeJemaat:", kodeJemaat);
+    // ============================
+    // 1. Ambil Foto Dari Multer
+    // ============================
+    const fotoFile = req.files?.foto ? req.files.foto[0] : null;
 
-    // Query menggunakan INNER JOIN ke dataPendeta (wajib Pendeta) dan LEFT JOIN ke dataRiwayatPendeta (opsional riwayat)
-    const query = `
-    SELECT
-        dj.kodeJemaat,
-        dj.namaLengkap,
-        dj.tempatLahir,
-        dj.tanggalLahir,
-        dj.jenisKelamin,
-        dj.agama,
-        dj.golonganDarah,
-        dj.nomorTelepon,
-        dj.alamat,
-        dj.foto,
-        dp.jabatan AS jabatanPendeta,
-        dp.sertifikatPendeta,
-        drp.namaGereja,
-        drp.tahunMulai,
-        drp.tahunSelesai
-    FROM dataJemaat dj
-    INNER JOIN dataPendeta dp ON dj.kodeJemaat = dp.kodeJemaat
-    LEFT JOIN dataRiwayatPendeta drp ON dp.kodePendeta = drp.kodePendeta
-    WHERE dj.kodeJemaat = ?
-    ORDER BY drp.tahunMulai DESC
-    `;
+    if (!fotoFile) {
+      return res.status(400).json({
+        message: "Foto wajib diupload."
+      });
+    }
 
-    db.query(query, [kodeJemaat], (err, results) => {
-        if (err) {
-            console.error("❌ Error getPendetaDetailBykodeJemaat:", err);
-            return res.status(500).json({ 
-                message: "Gagal mengambil data Pendeta", 
-                error: err.message 
-            });
-        }
+    // Path lengkap dengan forward slash
+    const fotoPath = fotoFile.path.replace(/\\/g, "/");
+    // Contoh hasil:
+    // uploads/fotoProfil/1763821205628-344538099.png
 
-        if (results.length === 0 || !results[0].jabatanPendeta) {
-            console.log("⚠️ Data Pendeta tidak ditemukan untuk kodeJemaat:", kodeJemaat);
-            return res.status(404).json({ 
-                message: "Data Pendeta tidak ditemukan untuk kodeJemaat: " + kodeJemaat
-            });
-        }
+    // ============================
+    // 2. Ambil Data Body
+    // ============================
+    const {
+      namaLengkap,
+      tempatLahir,
+      tanggalLahir,
+      jenisKelamin,
+      agama,
+      golonganDarah,
+      nomorTelepon,
+      alamat,
+      pepanthan,
+      namaPelayanan,
+      namaPekerjaan,
+      jabatanKerja,
+      dataPendeta,
+      dataPelayananList
+    } = req.body;
 
-        console.log("✅ Data ditemukan:", results.length, "row(s)");
+    // ============================
+    // 3. Parse dataPendeta (jabatan)
+    // ============================
+    let jabatan = null;
+    try {
+      jabatan = JSON.parse(dataPendeta)?.jabatan || null;
+    } catch {}
 
-        // 1. Ambil data dasar dari baris pertama
-        const firstRow = results[0];
-        const pendetaData = {
-            kodeJemaat: firstRow.kodeJemaat,
-            namaLengkap: firstRow.namaLengkap,
-            tempatLahir: firstRow.tempatLahir,
-            tanggalLahir: firstRow.tanggalLahir,
-            jenisKelamin: firstRow.jenisKelamin,
-            agama: firstRow.agama,
-            golonganDarah: firstRow.golonganDarah,
-            nomorTelepon: firstRow.nomorTelepon,
-            alamat: firstRow.alamat,
-            foto: firstRow.foto,
-            jabatanPendeta: firstRow.jabatanPendeta,
-            sertifikatPendeta: firstRow.sertifikatPendeta,
-            riwayatPendetaList: [], // Selalu diinisialisasi sebagai array kosong
-        };
+    // ============================
+    // 4. Parse Riwayat Pelayanan
+    // ============================
+    let pelayananList = [];
+    try {
+      pelayananList = JSON.parse(dataPelayananList) || [];
+    } catch {}
 
-        // 2. Iterasi melalui hasil untuk mengisi riwayatPendetaList
-        results.forEach((row) => {
-            // Hanya tambahkan jika ada riwayat (namaGereja tidak NULL dari LEFT JOIN)
-            if (row.namaGereja) {
-                pendetaData.riwayatPendetaList.push({
-                    namaGereja: row.namaGereja,
-                    tahunMulai: row.tahunMulai,
-                    tahunSelesai: row.tahunSelesai,
-                });
-            }
-        });
+    // ============================
+    // 5. INSERT DATA JEMAAT
+    // ============================
+    const [jemaatResult] = await promisePool.query(
+      `INSERT INTO dataJemaat
+      (namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        namaLengkap,
+        tempatLahir,
+        tanggalLahir,
+        jenisKelamin,
+        agama,
+        golonganDarah,
+        nomorTelepon,
+        alamat,
+        fotoPath // <-- Path foto lengkap
+      ]
+    );
 
-        console.log("📤 Mengirim data Pendeta ke frontend");
-        res.json(pendetaData);
-    });
+    // Ambil kode Jemaat baru
+    const kodeJemaatBaru = jemaatResult.insertId;
+
+    // ============================
+    // 6. INSERT PEPPANTHAN
+    // ============================
+    if (pepanthan) {
+      await promisePool.query(
+        `INSERT INTO dataPepanthan (kodeJemaat, namaPepanthan)
+         VALUES (?, ?)`,
+        [kodeJemaatBaru, pepanthan]
+      );
+    }
+
+    // ============================
+    // 7. INSERT PELAYANAN
+    // ============================
+    if (namaPelayanan) {
+      await promisePool.query(
+        `INSERT INTO dataPelayanan (kodeJemaat, namaPelayanan)
+         VALUES (?, ?)`,
+        [kodeJemaatBaru, namaPelayanan]
+      );
+    }
+
+    // ============================
+    // 8. INSERT PEKERJAAN
+    // ============================
+    if (namaPekerjaan || jabatanKerja) {
+      await promisePool.query(
+        `INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatanKerja)
+         VALUES (?, ?, ?)`,
+        [kodeJemaatBaru, namaPekerjaan, jabatanKerja]
+      );
+    }
+
+    // ============================
+    // 9. INSERT DATA PENDETA
+    // ============================
+    const [pendetaResult] = await promisePool.query(
+      `INSERT INTO dataPendeta (kodeJemaat, jabatan)
+       VALUES (?, ?)`,
+      [kodeJemaatBaru, jabatan]
+    );
+
+    const kodePendeta = pendetaResult.insertId;
+
+    // ============================
+    // 10. INSERT RIWAYAT PELAYANAN
+    // ============================
+    for (let p of pelayananList) {
+      await promisePool.query(
+        `INSERT INTO dataRiwayatPendeta
+         (kodePendeta, namaGereja, tahunMulai, tahunSelesai)
+         VALUES (?, ?, ?, ?)`,
+        [
+          kodePendeta,
+          p.namaGereja || "",
+          p.tahunMulai || null,
+          p.tahunSelesai || null
+        ]
+      );
+    }
+
+    // ============================
+    // 11. Response
+    // ============================
+    res.json({
+      message: "Pendeta berhasil ditambahkan!",
+      kodePendeta,
+      kodeJemaat: kodeJemaatBaru,
+      foto: fotoPath
+    });
+
+  } catch (err) {
+    console.error("❌ Error tambahPendeta:", err);
+    res.status(500).json({
+      message: "Gagal menambah pendeta",
+      error: err.message
+    });
+  }
 };
