@@ -5,7 +5,8 @@ import { NavbarComponent } from './components/NavbarComponent';
 const TabelDataJemaat = () => {
   const [dataJemaat, setDataJemaat] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState(''); // input sementara
+  const [search, setSearch] = useState(''); // filter diterapkan saat klik Cari
   const [filters, setFilters] = useState({
     jenisKelamin: '',
     pepanthan: '',
@@ -13,6 +14,8 @@ const TabelDataJemaat = () => {
     statusBaptis: '',
     statusNikah: '',
   });
+
+  const [appliedFilters, setAppliedFilters] = useState(filters);
 
   useEffect(() => {
     fetch("http://localhost:5000/api/jemaat")
@@ -33,15 +36,34 @@ const TabelDataJemaat = () => {
     setFilters({ ...filters, [key]: value });
   };
 
-  // Filter data sesuai search + filters
+  const handleApplySearch = () => {
+    setSearch(searchInput);
+    setAppliedFilters(filters);
+  };
+
+  const handleReset = () => {
+    setSearchInput('');
+    setSearch('');
+    const resetFilters = {
+      jenisKelamin: '',
+      pepanthan: '',
+      statusSidi: '',
+      statusBaptis: '',
+      statusNikah: '',
+    };
+    setFilters(resetFilters);
+    setAppliedFilters(resetFilters);
+  };
+
+  // Filter data sesuai search + filters yang diterapkan
   const filteredData = dataJemaat.filter(data => {
     return (
       data.namaLengkap.toLowerCase().includes(search.toLowerCase()) &&
-      (filters.jenisKelamin === '' || data.jenisKelamin === filters.jenisKelamin) &&
-      (filters.pepanthan === '' || data.namaPepanthan === filters.pepanthan) &&
-      (filters.statusSidi === '' || (filters.statusSidi === 'Sidi' ? data.statusSidi === 'Sidi' : data.statusSidi !== 'Sidi')) &&
-      (filters.statusBaptis === '' || (filters.statusBaptis === 'Baptis' ? data.statusBaptis === 'Baptis' : data.statusBaptis !== 'Baptis')) &&
-      (filters.statusNikah === '' || (filters.statusNikah === 'Nikah' ? data.statusNikah === 'Nikah' : data.statusNikah !== 'Nikah'))
+      (appliedFilters.jenisKelamin === '' || data.jenisKelamin === appliedFilters.jenisKelamin) &&
+      (appliedFilters.pepanthan === '' || data.namaPepanthan === appliedFilters.pepanthan) &&
+      (appliedFilters.statusSidi === '' || (appliedFilters.statusSidi === 'Sidi' ? data.statusSidi === 'Sidi' : data.statusSidi !== 'Sidi')) &&
+      (appliedFilters.statusBaptis === '' || (appliedFilters.statusBaptis === 'Baptis' ? data.statusBaptis === 'Baptis' : data.statusBaptis !== 'Baptis')) &&
+      (appliedFilters.statusNikah === '' || (appliedFilters.statusNikah === 'Nikah' ? data.statusNikah === 'Nikah' : data.statusNikah !== 'Nikah'))
     );
   });
 
@@ -55,10 +77,10 @@ const TabelDataJemaat = () => {
             className="form-control"
             placeholder="Cari jemaat..."
             aria-label="Cari jemaat"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
           />
-          <button type="button" className="btn btn-outline-secondary">
+          <button type="button" className="btn btn-outline-secondary" onClick={handleApplySearch}>
             Cari
           </button>
           <button
@@ -70,17 +92,17 @@ const TabelDataJemaat = () => {
             <span className="visually-hidden">Toggle Dropdown</span>
           </button>
           <ul className="dropdown-menu p-3" style={{ minWidth: '250px' }}>
-            <div>
+            <div className="mb-2">
               <strong>Jenis Kelamin</strong>
-              <select className="form-select mb-2" value={filters.jenisKelamin} onChange={e => handleFilterChange('jenisKelamin', e.target.value)}>
+              <select className="form-select" value={filters.jenisKelamin} onChange={e => handleFilterChange('jenisKelamin', e.target.value)}>
                 <option value=''>Semua</option>
                 <option value='Laki-laki'>Laki-laki</option>
                 <option value='Perempuan'>Perempuan</option>
               </select>
             </div>
-            <div>
+            <div className="mb-2">
               <strong>Pepanthan</strong>
-              <select className="form-select mb-2" value={filters.pepanthan} onChange={e => handleFilterChange('pepanthan', e.target.value)}>
+              <select className="form-select" value={filters.pepanthan} onChange={e => handleFilterChange('pepanthan', e.target.value)}>
                 <option value=''>Semua</option>
                 <option value='Induk Depok'>Induk Depok</option>
                 <option value='Triharjo'>Triharjo</option>
@@ -88,29 +110,34 @@ const TabelDataJemaat = () => {
                 <option value='Galur'>Galur</option>
               </select>
             </div>
-            <div>
+            <div className="mb-2">
               <strong>Status Sidi</strong>
-              <select className="form-select mb-2" value={filters.statusSidi} onChange={e => handleFilterChange('statusSidi', e.target.value)}>
+              <select className="form-select" value={filters.statusSidi} onChange={e => handleFilterChange('statusSidi', e.target.value)}>
                 <option value=''>Semua</option>
                 <option value='Sidi'>Sidi</option>
                 <option value='Belum Sidi'>Belum Sidi</option>
               </select>
             </div>
-            <div>
+            <div className="mb-2">
               <strong>Status Baptis</strong>
-              <select className="form-select mb-2" value={filters.statusBaptis} onChange={e => handleFilterChange('statusBaptis', e.target.value)}>
+              <select className="form-select" value={filters.statusBaptis} onChange={e => handleFilterChange('statusBaptis', e.target.value)}>
                 <option value=''>Semua</option>
                 <option value='Baptis'>Baptis</option>
                 <option value='Belum Baptis'>Belum Baptis</option>
               </select>
             </div>
-            <div>
+            <div className="mb-2">
               <strong>Status Pernikahan</strong>
-              <select className="form-select mb-2" value={filters.statusNikah} onChange={e => handleFilterChange('statusNikah', e.target.value)}>
+              <select className="form-select" value={filters.statusNikah} onChange={e => handleFilterChange('statusNikah', e.target.value)}>
                 <option value=''>Semua</option>
                 <option value='Nikah'>Nikah</option>
                 <option value='Belum Nikah'>Belum Nikah</option>
               </select>
+            </div>
+            <div className="d-grid mt-2">
+              <button type="button" className="btn btn-outline-danger btn-sm" onClick={handleReset}>
+                Reset Semua
+              </button>
             </div>
           </ul>
         </div>
