@@ -1,4 +1,3 @@
-// import React from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencilAlt, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -6,6 +5,9 @@ import { NavbarComponent } from '../components/NavbarComponent';
 import axios from 'axios';
 import { useEffect, useState } from "react";
 
+// Import default assets
+import maleIcon from '../assets/laki.png';
+import femaleIcon from '../assets/perempuan.png';
 
 // -----------------------------
 // 🌟 DETAIL ITEM COMPONENT
@@ -47,7 +49,6 @@ const DetailJemaat = ({ data }) => {
     { label: 'Agama', value: data.agama || '-' },
     { label: 'Golongan Darah', value: data.golonganDarah || '-' },
     { label: 'Warga Negara', value: data.wargaNegara || '-' },
-    { label: 'Alamat', value: data.alamat || '-' },
     { label: 'Nama Pekerjaan', value: data.namaPekerjaan || '-' },
     { label: 'Jabatan', value: data.jabatanKerja || '-' }
   ];
@@ -89,20 +90,15 @@ const DetailJemaat = ({ data }) => {
         data.namaPelayanan === "Pendeta"
           ? [
               `Jabatan: ${data.dataPendeta?.jabatan || "-"}`,
-              // Bagian ini sekarang akan berfungsi karena dataPendeta dan dataRiwayatPendeta 
-              // sudah digabungkan dari hasil fetch
               ...(data.dataRiwayatPendeta?.length > 0
                 ? data.dataRiwayatPendeta.map(
                     (r) =>
-                      `${r.namaGereja || "-"} | ${r.tahunMulai || "-"} - ${
-                        r.tahunSelesai || "-"
-                      }`
+                      `${r.namaGereja || "-"} | ${r.tahunMulai || "-"} - ${r.tahunSelesai || "-"}`
                   )
                 : ["Belum ada riwayat pelayanan"]),
             ]
           : [data.namaPelayanan || "-"],
-    }
-,
+    },
     { label: 'Pepanthan', value: data.namaPepanthan || '-' },
   ];
 
@@ -121,6 +117,15 @@ const DetailJemaat = ({ data }) => {
       alert("Gagal menghapus jemaat!");
     }
   };
+
+  // -----------------------------
+  // Pilih foto default berdasarkan jenis kelamin
+  // -----------------------------
+  const fotoSrc = data.foto
+    ? `http://localhost:5000/${data.foto}`
+    : data.jenisKelamin === "Perempuan"
+      ? femaleIcon
+      : maleIcon;
 
   return (
     <div className="container mt-4 mb-5">
@@ -175,7 +180,7 @@ const DetailJemaat = ({ data }) => {
             {/* FOTO */}
             <div className="col-12 col-lg-4 p-4 border-end d-flex flex-column align-items-center bg-light">
               <img
-                src={data.foto ? `http://localhost:5000/${data.foto}` : "https://placehold.co/150x150/004d99/ffffff?text=FOTO"}
+                src={fotoSrc}
                 alt="Foto Profil Jemaat"
                 className="img-fluid rounded-circle shadow mb-3"
                 style={{ width: '150px', height: '150px', objectFit: 'cover' }}
@@ -213,7 +218,7 @@ const DetailJemaat = ({ data }) => {
 };
 
 // -----------------------------
-// 🌟 MAIN PAGE - PERBAIKAN DI SINI
+// 🌟 MAIN PAGE
 // -----------------------------
 const HalamanDetail = () => {
   const location = useLocation();
@@ -239,8 +244,6 @@ const HalamanDetail = () => {
     };
     fetchPendeta();
   }, [initialData]);
-
-
 
   if (!data) return <div>Loading...</div>;
 

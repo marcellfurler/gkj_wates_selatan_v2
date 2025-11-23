@@ -329,6 +329,7 @@ export const hapusJemaat = async (req, res) => {
   const promisePool = db.promise();
 
   try {
+    // Ambil foto dari dataJemaat
     const [rows] = await promisePool.query(
       `SELECT foto FROM dataJemaat WHERE kodeJemaat=?`,
       [kodeJemaat]
@@ -340,34 +341,51 @@ export const hapusJemaat = async (req, res) => {
 
     const fotoPath = rows[0].foto;
 
-    const tables = [
+    // Hapus tabel yang menggunakan kodeJemaat
+    const tablesWithKodeJemaat = [
       "dataBaptis",
       "dataSidi",
       "dataNikah",
       "dataPekerjaan",
       "dataPelayanan",
       "dataPepanthan",
-      // "dataRiwayatPendidikan",
-      "dataRiwayatPendeta"
     ];
 
-    for (const t of tables) {
+    for (const t of tablesWithKodeJemaat) {
       await promisePool.query(`DELETE FROM ${t} WHERE kodeJemaat=?`, [kodeJemaat]);
     }
 
+    // Cek apakah jemaat ini pendeta (dataPendeta punya kodeJemaat)
+    const [pendetaRows] = await promisePool.query(
+      `SELECT kodePendeta FROM dataPendeta WHERE kodeJemaat=?`,
+      [kodeJemaat]
+    );
+
+    if (pendetaRows.length) {
+      const kodePendeta = pendetaRows[0].kodePendeta;
+      // Hapus dataRiwayatPendeta dan dataPendeta
+      await promisePool.query(`DELETE FROM dataRiwayatPendeta WHERE kodePendeta=?`, [kodePendeta]);
+      await promisePool.query(`DELETE FROM dataPendeta WHERE kodePendeta=?`, [kodePendeta]);
+    }
+
+    // Hapus data utama jemaat
     await promisePool.query(`DELETE FROM dataJemaat WHERE kodeJemaat=?`, [kodeJemaat]);
 
+    // Hapus foto
     if (fotoPath) {
       const absolute = path.join(process.cwd(), fotoPath);
       if (fs.existsSync(absolute)) await unlink(absolute);
     }
 
-    res.json({ message: "✅ Jemaat berhasil dihapus tanpa sertifikat!" });
+    res.json({ message: "✅ Jemaat berhasil dihapus!" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Gagal menghapus jemaat", err });
   }
 };
+
+
+
 
 export const tambahJemaat = async (req, res) => {
   try {
@@ -400,7 +418,7 @@ export const tambahJemaat = async (req, res) => {
     // Foto: pakai file multer atau default
     const foto = req.file
       ? `uploads/fotoProfil/${req.file.filename}`
-      : "uploads/fotoProfil/default.jpg";
+      : "uploads/fotoProfil/undefined.png";
 
     const promisePool = db.promise();
 
