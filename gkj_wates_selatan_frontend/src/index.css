@@ -76,3 +76,33 @@
     page-break-after: auto;
   }
 }
+
+/* file: index.css atau CSS yang sudah diimport */
+
+/* Buat jarak antar row */
+.table-hover tbody tr {
+  display: block;              /* supaya margin bisa diterapkan */
+  margin-bottom: 12px;         /* jarak antar baris */
+  padding: 10px 15px;          /* padding tiap row */
+  border-radius: 8px;           /* optional: agar terlihat card-like */
+  background-color: #fefefe;   /* warna background row */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* efek shadow ringan */
+}
+
+/* Agar sel tetap sejajar seperti tabel */
+.table-hover tbody tr td {
+  display: inline-block;
+  width: 9%;                   /* sesuaikan lebar kolom */
+  vertical-align: top;
+  padding: 2px 5px;            /* padding di dalam cell */
+  text-align: left;
+}
+
+/* Header tetap rapi */
+.table-hover thead tr th {
+  display: inline-block;
+  width: 9%;                   /* sama seperti td */
+  text-align: left;
+  background-color: #f8f9fa;   /* tetap background header */
+  padding: 5px 10px;
+}

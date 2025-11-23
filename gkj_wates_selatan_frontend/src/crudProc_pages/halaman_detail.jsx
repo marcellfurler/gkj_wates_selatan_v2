@@ -1,9 +1,11 @@
-import React from 'react';
+// import React from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencilAlt, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { NavbarComponent } from '../components/NavbarComponent';
 import axios from 'axios';
+import { useEffect, useState } from "react";
+
 
 // -----------------------------
 // 🌟 DETAIL ITEM COMPONENT
@@ -82,19 +84,25 @@ const DetailJemaat = ({ data }) => {
         : ['Belum Nikah', ''],
     },
     {
-      label: 'Pelayanan',
-      value: data.namaPelayanan === 'Pendeta'
-        ? [
-            `Jabatan: ${data.dataPendeta?.jabatan || '-'}`,
-            ...(data.dataRiwayatPendeta?.length > 0
-              ? data.dataRiwayatPendeta.map(
-                  (r) =>
-                    `${r.namaGereja || '-'} | ${r.tahunMulai || '-'} - ${r.tahunSelesai || '-'}`
-                )
-              : ['Belum ada riwayat pelayanan'])
-          ]
-        : [data.namaPelayanan || '-']
-    },
+      label: "Pelayanan",
+      value:
+        data.namaPelayanan === "Pendeta"
+          ? [
+              `Jabatan: ${data.dataPendeta?.jabatan || "-"}`,
+              // Bagian ini sekarang akan berfungsi karena dataPendeta dan dataRiwayatPendeta 
+              // sudah digabungkan dari hasil fetch
+              ...(data.dataRiwayatPendeta?.length > 0
+                ? data.dataRiwayatPendeta.map(
+                    (r) =>
+                      `${r.namaGereja || "-"} | ${r.tahunMulai || "-"} - ${
+                        r.tahunSelesai || "-"
+                      }`
+                  )
+                : ["Belum ada riwayat pelayanan"]),
+            ]
+          : [data.namaPelayanan || "-"],
+    }
+,
     { label: 'Pepanthan', value: data.namaPepanthan || '-' },
   ];
 
@@ -205,25 +213,36 @@ const DetailJemaat = ({ data }) => {
 };
 
 // -----------------------------
-// 🌟 MAIN PAGE
+// 🌟 MAIN PAGE - PERBAIKAN DI SINI
 // -----------------------------
 const HalamanDetail = () => {
   const location = useLocation();
-  const data = location.state?.data;
+  const initialData = location.state?.data;
+  const [data, setData] = useState(initialData);
 
-  if (!data) {
-    return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#e2e2e2' }}>
-        <NavbarComponent />
-        <div className="container mt-5 text-center">
-          <h4>Data jemaat tidak ditemukan atau gagal dimuat dari halaman sebelumnya.</h4>
-          <Link to="/data" className="btn btn-outline-secondary mt-3">
-            &larr; Kembali ke Daftar Jemaat
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const fetchPendeta = async () => {
+      if (initialData?.namaPelayanan === "Pendeta" && initialData?.kodePendeta) {
+        try {
+          const { data: pendetaData } = await axios.get(
+            `http://localhost:5000/api/pendeta/${initialData.kodePendeta}`
+          );
+          setData(prevData => ({
+            ...prevData,
+            dataPendeta: pendetaData.dataPendeta,
+            dataRiwayatPendeta: pendetaData.dataRiwayatPendeta,
+          }));
+        } catch (err) {
+          console.error("Gagal fetch detail pendeta:", err);
+        }
+      }
+    };
+    fetchPendeta();
+  }, [initialData]);
+
+
+
+  if (!data) return <div>Loading...</div>;
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
