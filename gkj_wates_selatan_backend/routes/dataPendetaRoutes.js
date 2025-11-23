@@ -33,4 +33,6 @@ router.post(
   dataPendetaController.tambahPendeta
 );
 
+router.get("/:kodePendeta", dataPendetaController.getDetailPendeta);
+
 export default router;

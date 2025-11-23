@@ -42,6 +42,7 @@ export const getAllJemaat = (req, res) => {
       pe.namaPekerjaan,
       pe.jabatanKerja,
 
+      dp.jabatan,
 
       drp.namaGereja,
       drp.tahunMulai,
@@ -138,6 +139,8 @@ const formatDate = (dateStr) => {
   if (!dateStr) return null;
   return dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
 };
+
+
 
 export const updateJemaat = async (req, res) => {
   const { kodeJemaat } = req.params;

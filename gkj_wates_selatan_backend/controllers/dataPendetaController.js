@@ -11,25 +11,20 @@ export const tambahPendeta = async (req, res) => {
 
     const promisePool = db.promise();
 
-    // ============================
-    // 1. Ambil Foto Dari Multer
-    // ============================
+    // ======================================
+    // 1. FOTO
+    // ======================================
     const fotoFile = req.files?.foto ? req.files.foto[0] : null;
 
     if (!fotoFile) {
-      return res.status(400).json({
-        message: "Foto wajib diupload."
-      });
+      return res.status(400).json({ message: "Foto wajib diupload." });
     }
 
-    // Path lengkap dengan forward slash
     const fotoPath = fotoFile.path.replace(/\\/g, "/");
-    // Contoh hasil:
-    // uploads/fotoProfil/1763821205628-344538099.png
 
-    // ============================
+    // ======================================
     // 2. Ambil Data Body
-    // ============================
+    // ======================================
     const {
       namaLengkap,
       tempatLahir,
@@ -41,35 +36,58 @@ export const tambahPendeta = async (req, res) => {
       alamat,
       pepanthan,
       namaPelayanan,
+
+      // pekerjaan
       namaPekerjaan,
       jabatanKerja,
+
+      // nikah
+      statusNikah,
+      tanggalNikah,
+      tempatNikah,
+      namaPasangan,
+      gerejaAsal,
+
+      // sidi
+      statusSidi,
+      tanggalSidi,
+      tempatSidi,
+
+      // baptis
+      statusBaptis,
+      tanggalBaptis,
+      tempatBaptis,
+
+      // meninggal
+      statusMeninggal,
+      tanggalMeninggal,
+      tempatMeninggal,
+
+      // pendeta
       dataPendeta,
       dataPelayananList
     } = req.body;
 
-    // ============================
-    // 3. Parse dataPendeta (jabatan)
-    // ============================
+    // ======================================
+    // 3. Parse JSON
+    // ======================================
     let jabatan = null;
     try {
       jabatan = JSON.parse(dataPendeta)?.jabatan || null;
     } catch {}
 
-    // ============================
-    // 4. Parse Riwayat Pelayanan
-    // ============================
     let pelayananList = [];
     try {
       pelayananList = JSON.parse(dataPelayananList) || [];
     } catch {}
 
-    // ============================
-    // 5. INSERT DATA JEMAAT
-    // ============================
+    // ======================================
+    // 4. INSERT dataJemaat
+    // ======================================
     const [jemaatResult] = await promisePool.query(
       `INSERT INTO dataJemaat
-      (namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, agama, golonganDarah, nomorTelepon, alamat, foto)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         namaLengkap,
         tempatLahir,
@@ -79,16 +97,15 @@ export const tambahPendeta = async (req, res) => {
         golonganDarah,
         nomorTelepon,
         alamat,
-        fotoPath // <-- Path foto lengkap
+        fotoPath
       ]
     );
 
-    // Ambil kode Jemaat baru
     const kodeJemaatBaru = jemaatResult.insertId;
 
-    // ============================
-    // 6. INSERT PEPPANTHAN
-    // ============================
+    // ======================================
+    // 5. INSERT dataPepanthan
+    // ======================================
     if (pepanthan) {
       await promisePool.query(
         `INSERT INTO dataPepanthan (kodeJemaat, namaPepanthan)
@@ -97,9 +114,9 @@ export const tambahPendeta = async (req, res) => {
       );
     }
 
-    // ============================
-    // 7. INSERT PELAYANAN
-    // ============================
+    // ======================================
+    // 6. INSERT dataPelayanan
+    // ======================================
     if (namaPelayanan) {
       await promisePool.query(
         `INSERT INTO dataPelayanan (kodeJemaat, namaPelayanan)
@@ -108,9 +125,9 @@ export const tambahPendeta = async (req, res) => {
       );
     }
 
-    // ============================
-    // 8. INSERT PEKERJAAN
-    // ============================
+    // ======================================
+    // 7. INSERT dataPekerjaan
+    // ======================================
     if (namaPekerjaan || jabatanKerja) {
       await promisePool.query(
         `INSERT INTO dataPekerjaan (kodeJemaat, namaPekerjaan, jabatanKerja)
@@ -119,9 +136,74 @@ export const tambahPendeta = async (req, res) => {
       );
     }
 
-    // ============================
-    // 9. INSERT DATA PENDETA
-    // ============================
+    // ======================================
+    // 8. INSERT dataNikah
+    // ======================================
+    if (statusNikah && statusNikah !== "Belum Nikah") {
+      await promisePool.query(
+        `INSERT INTO dataNikah (kodeJemaat, statusNikah, tanggalNikah, tempatNikah, namaPasangan, gerejaAsal)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          kodeJemaatBaru,
+          statusNikah,
+          tanggalNikah || null,
+          tempatNikah || null,
+          namaPasangan || null,
+          gerejaAsal || null
+        ]
+      );
+    }
+
+    // ======================================
+    // 9. INSERT dataSidi
+    // ======================================
+    if (statusSidi && statusSidi !== "Belum Sidi") {
+      await promisePool.query(
+        `INSERT INTO dataSidi (kodeJemaat, statusSidi, tanggalSidi, tempatSidi)
+         VALUES (?, ?, ?, ?)`,
+        [
+          kodeJemaatBaru,
+          statusSidi,
+          tanggalSidi || null,
+          tempatSidi || null
+        ]
+      );
+    }
+
+    // ======================================
+    // 10. INSERT dataBaptis
+    // ======================================
+    if (statusBaptis && statusBaptis !== "Belum Baptis") {
+      await promisePool.query(
+        `INSERT INTO dataBaptis (kodeJemaat, statusBaptis, tanggalBaptis, tempatBaptis)
+         VALUES (?, ?, ?, ?)`,
+        [
+          kodeJemaatBaru,
+          statusBaptis,
+          tanggalBaptis || null,
+          tempatBaptis || null
+        ]
+      );
+    }
+
+    // ======================================
+    // 11. INSERT dataKematian
+    // ======================================
+    if (statusMeninggal === "Meninggal") {
+      await promisePool.query(
+        `INSERT INTO dataKematian (kodeJemaat, tanggalMeninggal, tempatMeninggal)
+         VALUES (?, ?, ?)`,
+        [
+          kodeJemaatBaru,
+          tanggalMeninggal || null,
+          tempatMeninggal || null
+        ]
+      );
+    }
+
+    // ======================================
+    // 12. INSERT dataPendeta
+    // ======================================
     const [pendetaResult] = await promisePool.query(
       `INSERT INTO dataPendeta (kodeJemaat, jabatan)
        VALUES (?, ?)`,
@@ -130,13 +212,12 @@ export const tambahPendeta = async (req, res) => {
 
     const kodePendeta = pendetaResult.insertId;
 
-    // ============================
-    // 10. INSERT RIWAYAT PELAYANAN
-    // ============================
+    // ======================================
+    // 13. INSERT Riwayat Pelayanan
+    // ======================================
     for (let p of pelayananList) {
       await promisePool.query(
-        `INSERT INTO dataRiwayatPendeta
-         (kodePendeta, namaGereja, tahunMulai, tahunSelesai)
+        `INSERT INTO dataRiwayatPendeta (kodePendeta, namaGereja, tahunMulai, tahunSelesai)
          VALUES (?, ?, ?, ?)`,
         [
           kodePendeta,
@@ -147,9 +228,9 @@ export const tambahPendeta = async (req, res) => {
       );
     }
 
-    // ============================
-    // 11. Response
-    // ============================
+    // ======================================
+    // 14. RESPONSE
+    // ======================================
     res.json({
       message: "Pendeta berhasil ditambahkan!",
       kodePendeta,
@@ -164,4 +245,85 @@ export const tambahPendeta = async (req, res) => {
       error: err.message
     });
   }
+};
+
+
+export const getDetailPendeta = (req, res) => {
+  const { kodePendeta } = req.params;
+
+  const query = `
+    SELECT
+      dp.kodePendeta,
+      dp.jabatan,
+
+      j.kodeJemaat,
+      j.namaLengkap,
+      j.tempatLahir,
+      j.tanggalLahir,
+      j.jenisKelamin,
+      j.agama,
+      j.nomorTelepon,
+      j.alamat,
+      j.foto,
+
+      drp.kodeRiwayatPendeta,
+      drp.namaGereja,
+      drp.tahunMulai,
+      drp.tahunSelesai
+
+    FROM dataPendeta dp
+    INNER JOIN dataJemaat j ON dp.kodeJemaat = j.kodeJemaat
+    LEFT JOIN dataRiwayatPendeta drp ON dp.kodePendeta = drp.kodePendeta
+    WHERE dp.kodePendeta = ?
+  `;
+
+  db.query(query, [kodePendeta], (err, results) => {
+    if (err) {
+      console.error("❌ Error getDetailPendeta:", err);
+      return res.status(500).json({ message: "Gagal mengambil data pendeta", err });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Pendeta tidak ditemukan" });
+    }
+
+    // ambil data row pertama
+    const r0 = results[0];
+
+    // struktur FINAL yang React butuhkan
+    const response = {
+      // data utama jemaat
+      kodeJemaat: r0.kodeJemaat,
+      namaLengkap: r0.namaLengkap,
+      tempatLahir: r0.tempatLahir,
+      tanggalLahir: r0.tanggalLahir,
+      jenisKelamin: r0.jenisKelamin,
+      agama: r0.agama,
+      nomorTelepon: r0.nomorTelepon,
+      alamat: r0.alamat,
+      foto: r0.foto,
+
+      // supaya bagian:
+      // data.namaPelayanan === "Pendeta"
+      namaPelayanan: "Pendeta",
+
+      // === DATA PENDETA ===
+      dataPendeta: {
+        kodePendeta: r0.kodePendeta,
+        jabatan: r0.jabatan
+      },
+
+      // === RIWAYAT PELAYANAN ===
+      dataRiwayatPendeta: results
+        .filter(r => r.kodeRiwayatPendeta)
+        .map(r => ({
+          kodeRiwayatPendeta: r.kodeRiwayatPendeta,
+          namaGereja: r.namaGereja,
+          tahunMulai: r.tahunMulai,
+          tahunSelesai: r.tahunSelesai
+        }))
+    };
+
+    res.json(response);
+  });
 };
