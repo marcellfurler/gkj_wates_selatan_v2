@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import { NavbarComponent } from './components/NavbarComponent';
+  // import jwt from "jsonwebtoken";
+  import { useNavigate } from "react-router-dom";
+
 
 const TabelDataJemaat = () => {
+  const navigate = useNavigate();  
   const [dataJemaat, setDataJemaat] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState(''); // input sementara
@@ -17,18 +21,46 @@ const TabelDataJemaat = () => {
 
   const [appliedFilters, setAppliedFilters] = useState(filters);
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/jemaat")
-      .then(res => res.json())
-      .then(data => {
-        setDataJemaat(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("❌ Gagal mengambil data jemaat:", err);
-        setLoading(false);
-      });
-  }, []);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 25;
+
+
+
+
+
+ useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    navigate("/login");
+    return;
+  }
+
+  fetch("http://localhost:5000/api/jemaat", {
+    headers: { "Authorization": `Bearer ${token}` }
+  })
+  .then(async res => {
+    if (!res.ok) {
+      if (res.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+      // baca teks dulu supaya bisa log error
+      const text = await res.text();
+      throw new Error(`HTTP ${res.status}: ${text}`);
+    }
+    return res.json();
+  })
+  .then(data => {
+    setDataJemaat(data);
+    setLoading(false);
+  })
+  .catch(err => {
+    console.error("❌ Gagal mengambil data jemaat:", err);
+    setLoading(false);
+  });
+}, [navigate]);
+ 
+
 
   if (loading) return <p className="text-center mt-5">⏳ Memuat data jemaat...</p>;
 
@@ -55,6 +87,14 @@ const TabelDataJemaat = () => {
     setAppliedFilters(resetFilters);
   };
 
+  const formatTanggal = (tanggal) => {
+    if (!tanggal) return "-";
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    return new Date(tanggal).toLocaleDateString('id-ID', options);
+  };
+
+
+
   // Filter data sesuai search + filters yang diterapkan
   const filteredData = dataJemaat.filter(data => {
     return (
@@ -67,8 +107,18 @@ const TabelDataJemaat = () => {
     );
   });
 
+  // Pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  const currentData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
   return (
-    <div className="container-fluid mt-5 mb-5 px-5">
+    <div className="container-fluid mt-4 mb-3 px-5">
+      <h3 className="text-center">Data Utama</h3>
+
       {/* Search + Filter */}
       <div className="d-flex justify-content-end mb-3">
         <div className="input-group" style={{ maxWidth: '300px' }}>
@@ -148,11 +198,14 @@ const TabelDataJemaat = () => {
         <div className="card-body p-0">
           <div className="table-responsive">
             <table
-              className="table table-primary table-striped table-sm table-hover mb-1"
-              style={{ borderCollapse: 'separate', borderSpacing: '0 5px' }}
+              className="table table-primary table-striped-columns table-sm table-hover mb-1"
+              style={{ 
+                borderCollapse: 'separate',
+                borderSpacing: '0 6px'   // ⬅️ jarak antar baris
+              }}
             >
               <thead style={{ backgroundColor: '#f8f9fa' }}>
-                <tr>
+                <tr className="text-center">
                   <th>No</th>
                   <th>Nama Jemaat</th>
                   <th>Tempat, Tanggal Lahir</th>
@@ -166,40 +219,106 @@ const TabelDataJemaat = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredData.length > 0 ? (
-                  filteredData.map((data, index) => (
-                    <tr key={index} style={{ fontSize: '0.9rem', backgroundColor: '#fff', borderRadius: '6px' }}>
-                      <td>{index + 1}</td>
+                {currentData.length > 0 ? (
+                  currentData.map((data, index) => (
+                    <tr
+                      key={index}
+                      className="align-middle"
+                      style={{ fontSize: '0.9rem', backgroundColor: '#fff', borderRadius: '6px' }}
+                    >
+                      <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                       <td>{data.namaLengkap}</td>
-                      <td>{data.tempatLahir}, {data.tanggalLahir ? new Date(data.tanggalLahir).toLocaleDateString("id-ID") : '-'}</td>
-                      <td>{data.jenisKelamin || '-'}</td>
-                      <td>{data.namaPepanthan || '-'}</td>
-                      <td>{data.statusSidi === 'Sidi' ? 'Sidi' : 'Belum Sidi'}</td>
-                      <td>{data.statusBaptis === 'Baptis' ? 'Baptis' : 'Belum Baptis'}</td>
-                      <td>{data.statusNikah === 'Nikah' ? 'Nikah' : 'Belum Nikah'}</td>
-                      <td>{data.namaPelayanan ?? 'Jemaat'}</td>
                       <td>
-                        <Link to="/detail" state={{ data }} className="text-primary" title="Lihat Detail">
-                          detail
-                        </Link>
+                        {data.tempatLahir || '-'}, {formatTanggal(data.tanggalLahir)}
+                      </td>
+                      <td className="text-center">{data.jenisKelamin || '-'}</td>
+                      <td className="text-center">{data.namaPepanthan || '-'}</td>
+                      <td className="text-center">{data.statusSidi === 'Sidi' ? 'Sidi' : 'Belum Sidi'}</td>
+                      <td className="text-center">{data.statusBaptis === 'Baptis' ? 'Baptis' : 'Belum Baptis'}</td>
+                      <td className="text-center">{data.statusNikah === 'Nikah' ? 'Nikah' : 'Belum Nikah'}</td>
+                      <td className="text-center">{data.namaPelayanan ?? 'Jemaat'}</td>
+
+                      <td className="text-center">
+                        <button
+                          type="button"
+                          className="btn btn-light"
+                          onClick={() => navigate("/detail", { state: { data } })}
+                        >
+                          Detail
+                        </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="10" className="text-center">Data tidak ditemukan</td>
+                    <td colSpan="10" className="text-center align-middle">Data tidak ditemukan</td>
                   </tr>
                 )}
               </tbody>
+
+
             </table>
           </div>
         </div>
       </div>
+      {/* Pagination Bootstrap */}
+      <nav aria-label="Page navigation example">
+        <ul className="pagination justify-content-end mt-3">
+
+          {/* Previous */}
+          <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+            <button
+              className="page-link"
+              onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+            >
+              Previous
+            </button>
+          </li>
+
+          {/* Numbered pages */}
+          {[...Array(totalPages)].map((_, i) => (
+            <li
+              key={i}
+              className={`page-item ${currentPage === i + 1 ? "active" : ""}`}
+            >
+              <button
+                className="page-link"
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            </li>
+          ))}
+
+          {/* Next */}
+          <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+            <button
+              className="page-link"
+              onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
+            >
+              Next
+            </button>
+          </li>
+
+        </ul>
+      </nav>
+
     </div>
   );
 };
 
 const HalamanData = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // jika tidak ada token, direkt ke halaman login
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'white' }}>
       <NavbarComponent />
@@ -207,5 +326,6 @@ const HalamanData = () => {
     </div>
   );
 };
+
 
 export default HalamanData;

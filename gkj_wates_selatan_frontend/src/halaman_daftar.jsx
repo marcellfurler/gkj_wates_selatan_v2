@@ -1,110 +1,156 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import logoGKJ from './assets/logoGKJ.png';
 import backgroundimg2 from './assets/gkjwatesselatan2.png';
 import { NavbarComponentLogin } from './components/NavbarComponent';
 
-// Komponen Navbar (sama seperti halaman login)
-
+// =======================
 // Komponen Form Daftar
+// =======================
 const RegisterForm = () => {
+    const navigate = useNavigate();
+
+    // State untuk menampung input form
+    const [formData, setFormData] = useState({
+        namaLengkapUser: "",
+        username: "",
+        nomorHP: "",   // email ATAU nomor hp
+        password: ""
+    });
+
+
+    // Fungsi untuk handle input
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.id]: e.target.value
+        });
+    };
+
+    // Fungsi untuk submit data ke backend
+    const handleSubmit = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/api/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                alert(result.message || "Pendaftaran gagal");
+                return;
+            }
+
+            alert("Pendaftaran berhasil!");
+            navigate("/login"); // redirect ke login
+
+        } catch (error) {
+            console.error("❌ Error:", error);
+            alert("Terjadi kesalahan server");
+        }
+    };
+
     return (
-        <div className="card shadow-sm p-4" style={{ 
-            width: '400px', 
-            backgroundColor: '#f0f0f0', 
+        <div className="card shadow-sm p-4" style={{
+            width: '400px',
+            backgroundColor: '#f0f0f0',
             border: 'none',
             textAlign: 'center',
             borderRadius: '10px',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
         }}>
-            {/* Logo GKJ di atas Form */}
             <img
                 src={logoGKJ}
-                alt="Logo GKJ Besar"
+                alt="Logo GKJ"
                 width="90"
                 height="90"
-                className="d-block mx-auto mb-3" // Mengubah mb-2 ke mb-3 untuk jarak yang lebih baik
+                className="d-block mx-auto mb-3"
                 style={{ objectFit: 'cover' }}
             />
-            
+
             {/* Nama Lengkap */}
             <div className="mb-2 text-start">
-                <label htmlFor="namaLengkapInput" className="form-label">Nama Lengkap</label>
-                <input 
-                    type="text" 
-                    className="form-control form-control-lg" 
-                    id="namaLengkapInput" 
-                    style={{ backgroundColor: '#e9ecef', border: 'none', height: '50px' }} // Menyesuaikan tinggi input
+                <label className="form-label">Nama Lengkap</label>
+                <input
+                    type="text"
+                    id="namaLengkapUser"
+                    className="form-control form-control-lg"
+                    style={{ backgroundColor: '#e9ecef', border: 'none', height: '50px' }}
+                    onChange={handleChange}
                 />
             </div>
 
             {/* Nama Pengguna */}
             <div className="mb-2 text-start">
-                <label htmlFor="usernameInput" className="form-label">Nama Pengguna</label>
-                <input 
-                    type="text" 
-                    className="form-control form-control-lg" 
-                    id="usernameInput" 
-                    style={{ backgroundColor: '#e9ecef', border: 'none', height: '50px' }} // Menyesuaikan tinggi input
+                <label className="form-label">Nama Pengguna</label>
+                <input
+                    type="text"
+                    id="username"
+                    className="form-control form-control-lg"
+                    style={{ backgroundColor: '#e9ecef', border: 'none', height: '50px' }}
+                    onChange={handleChange}
                 />
             </div>
 
-            {/* Nomor HP / Email */}
+            {/* Email */}
             <div className="mb-2 text-start">
-                <label htmlFor="emailInput" className="form-label">Nomor HP/ Email</label>
-                <input 
-                    type="email" 
-                    className="form-control form-control-lg" 
-                    id="emailInput" 
-                    style={{ backgroundColor: '#e9ecef', border: 'none', height: '50px' }} // Menyesuaikan tinggi input
+                <label className="form-label">Nomor HP / Email</label>
+                <input
+                    type="text"
+                    id="nomorHP"
+                    className="form-control form-control-lg"
+                    style={{ backgroundColor: '#e9ecef', border: 'none', height: '50px' }}
+                    onChange={handleChange}
                 />
+
             </div>
 
-            {/* Kata Sandi */}
-            <div className="mb-2 text-start"> {/* Mengubah mb-2 ke mb-4 untuk jarak tombol */}
-                <label htmlFor="passwordInput" className="form-label">Kata Sandi</label>
-                <input 
-                    type="password" 
-                    className="form-control form-control-lg" 
-                    id="passwordInput" 
-                    style={{ backgroundColor: '#e9ecef', border: 'none', height: '50px' }} // Menyesuaikan tinggi input
+            {/* Password */}
+            <div className="mb-2 text-start">
+                <label className="form-label">Kata Sandi</label>
+                <input
+                    type="password"
+                    id="password"
+                    className="form-control form-control-lg"
+                    style={{ backgroundColor: '#e9ecef', border: 'none', height: '50px' }}
+                    onChange={handleChange}
                 />
             </div>
 
             {/* Tombol Daftar */}
-            <Link to="/login" style={{ color: "white", textDecoration: "none" }}>
-                <button 
-                    type="button" 
-                    className="btn btn-info btn-lg w-100 fw-bold shadow-sm" 
-                    style={{ backgroundColor: '#004d99', borderColor: '#004d99', color: 'white', padding: '12px' }} // Menyesuaikan padding tombol
-                    onClick={(e) => {console.log("Tombol Daftar diklik"); }}
-                >
-                    DAFTAR
-                </button>
-            </Link>            
+            <button
+                type="button"
+                className="btn btn-info btn-lg w-100 fw-bold shadow-sm"
+                style={{ backgroundColor: '#004d99', borderColor: '#004d99', color: 'white', padding: '12px' }}
+                onClick={handleSubmit}
+            >
+                DAFTAR
+            </button>
         </div>
     );
 };
 
-// Komponen Halaman Daftar Utama
+// =======================
+// HALAMAN DAFTAR UTAMA
+// =======================
 const HalamanDaftar = () => {
     return (
         <>
-            {/* Memuat Bootstrap CSS dari CDN */}
-            <link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
-                crossOrigin="anonymous" 
+            <link
+                rel="stylesheet"
+                href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+                crossOrigin="anonymous"
             />
 
             <NavbarComponentLogin />
-            
-            {/* Konten Utama: Menggunakan flexbox untuk layout 100vh */}
+
             <div className="d-flex" style={{ height: 'calc(100vh - 80px)' }}>
                 
-                {/* Kolom Kiri: Gambar Latar */}
-                <div 
+                {/* KIRI: GAMBAR */}
+                <div
                     className="d-flex flex-column justify-content-center align-items-center text-white p-5"
                     style={{
                         flex: 1,
@@ -115,8 +161,9 @@ const HalamanDaftar = () => {
                         backgroundAttachment: 'fixed'
                     }}
                 >
+
                     {/* Overlay */}
-                    <div 
+                    <div
                         className="position-absolute top-0 start-0 w-100 h-100"
                         style={{
                             backdropFilter: 'blur(10px)',
@@ -125,44 +172,39 @@ const HalamanDaftar = () => {
                         }}
                     />
 
-                    {/* Konten Login */}
+                    {/* Konten */}
                     <div className="position-relative text-center" style={{ zIndex: 2 }}>
-                        <Link to="/login" style={{ textDecoration: "none"}}>
-                            <button 
+                        <Link to="/login" style={{ textDecoration: "none" }}>
+                            <button
                                 className="btn btn-light btn-lg fw-bold shadow-lg mb-4"
-                                style={{ 
-                                    backgroundColor: 'rgba(108, 117, 125, 0.7)',  
-                                    color: 'white', 
+                                style={{
+                                    backgroundColor: 'rgba(108, 117, 125, 0.7)',
+                                    color: 'white',
                                     padding: '15px 40px',
                                     fontSize: '1.5rem'
                                 }}
-                                onClick={() => console.log("Tombol Masuk di sidebar diklik")}
                             >
                                 MASUK
                             </button>
                         </Link>
-                        
+
                         <p className="lead mb-5" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.7)' }}>
-                            Saya sudah memiliki akun, saya akan <a href="/login" className="text-white text-decoration-underline fw-bold">MASUK</a>
+                            Saya sudah memiliki akun, saya akan{" "}
+                            <Link to="/login" className="text-white text-decoration-underline fw-bold">MASUK</Link>
                         </p>
 
-                        <Link to="/" style={{ color: "white", textDecoration: "none"}}>
-                            <a href="#" className="text-white mt-5 d-block text-decoration-none" style={{ fontSize: '1.1rem', textShadow: '1px 1px 2px rgba(0,0,0,0.7)' }}>
-                                &larr; Kembali ke halaman awal
-                            </a>
+                        <Link to="/" className="text-white text-decoration-none" style={{ fontSize: '1.1rem' }}>
+                            &larr; Kembali ke halaman awal
                         </Link>
                     </div>
                 </div>
 
-                {/* Kolom Kanan: Form Daftar */}
-                <div 
-                    className="d-flex justify-content-center align-items-center p-5" 
-                    style={{ 
-                        flex: 1,
-                        backgroundColor: '#f8f9fa',
-                    }}
+                {/* KANAN: FORM REGISTER */}
+                <div
+                    className="d-flex justify-content-center align-items-center p-5"
+                    style={{ flex: 1, backgroundColor: '#f8f9fa' }}
                 >
-                    <div className="mt-5"> {/* Mengubah style `marginTop: '-10vh'` menjadi kelas `mt-5` */}
+                    <div className="mt-5">
                         <RegisterForm />
                     </div>
                 </div>

@@ -104,70 +104,43 @@ const EditJemaat = () => {
 
   // Submit form
 // Submit form
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const kodeJemaat = formData.kodeJemaat;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const kodeJemaat = formData.kodeJemaat;
 
-  // Buat FormData untuk dikirim
-  const fd = new FormData();
+    const fd = new FormData();
 
-  // Append semua field kecuali foto
-  for (const key in formData) {
-    if (key === "foto") continue; // foto ditangani terpisah
-    fd.append(key, formData[key] ?? "");
-  }
-
-  // Append foto jika ada
-  if (formData.foto) {
-    fd.append("foto", formData.foto);
-  }
-
-  try {
-    const res = await fetch(`http://localhost:5000/api/jemaat/${kodeJemaat}`, {
-      method: "PUT",
-      body: fd,
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      alert("✅ Data jemaat berhasil diperbarui!");
-      navigate(-1);
-    } else {
-      alert("❌ " + (data.message || "Gagal memperbarui data jemaat."));
+    // Append semua field
+    for (const key in formData) {
+      if (key === "foto") continue;
+      fd.append(key, formData[key] ?? "");
     }
-  } catch (err) {
-    console.error("❌ Error saat update:", err);
-  }
 
+    // Append foto
+    if (formData.foto) {
+      fd.append("foto", formData.foto);
+    }
 
-
-
-
-    // Append pendidikanList
-    // formDataToSend.append("pendidikanList", JSON.stringify(pendidikanList));
-
-    // Sertifikat baru untuk status
+    // Append sertifikat baru
     Object.keys(statusFileMap).forEach((status) => {
       if (statusFileMap[status]) {
-        const fieldName = `sertifikat${status.charAt(0).toUpperCase() + status.slice(1)}`; // contoh: 'baptis' → 'sertifikatBaptis'
-        formDataToSend.append(fieldName, statusFileMap[status]);
+        const fieldName = `sertifikat${status.charAt(0).toUpperCase() + status.slice(1)}`;
+        fd.append(fieldName, statusFileMap[status]);
       }
     });
 
-
-    // Delete status
+    // Append deleteStatus
     if (deleteStatus.length > 0) {
-      formDataToSend.append("deleteStatus", JSON.stringify(deleteStatus));
+      fd.append("deleteStatus", JSON.stringify(deleteStatus));
     }
 
     try {
       const res = await fetch(`http://localhost:5000/api/jemaat/${kodeJemaat}`, {
         method: "PUT",
-        body: formDataToSend,
+        body: fd,
       });
-      const data = await res.json();
 
+      const data = await res.json();
       if (res.ok) {
         alert("✅ Data jemaat berhasil diperbarui!");
         navigate(-1);

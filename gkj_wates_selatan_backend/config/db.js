@@ -1,17 +1,11 @@
 // config/db.js
-import mysql from "mysql2";
+import mysql from "mysql2/promise";
 
-export const db = mysql.createConnection({
+export const db = await mysql.createPool({
   host: "localhost",
   user: "root",
-  password: "", // ganti sesuai MySQL kamu
-  database: "gkj_wates_selatan_v3" // ganti sesuai nama database kamu
+  password: "", // sesuaikan
+  database: "gkj_wates_selatan_v3"
 });
 
-db.connect((err) => {
-  if (err) {
-    console.error("❌ Gagal konek database:", err);
-  } else {
-    console.log("✅ Database terhubung");
-  }
-});
+console.log("✅ Database terhubung (promise)");

@@ -1,13 +1,11 @@
-// controllers/dataJemaatController.js
 import { db } from "../config/db.js";
-import path from "path";
+import path from "path";          // << tambahkan ini
 import fs from "fs";
 import { unlink } from "fs/promises";
 
-// ===================================================
-// AMBIL SEMUA DATA JEMAAT + RELASI
-// ===================================================
-export const getAllJemaat = (req, res) => {
+
+
+export const getAllJemaat = async (req, res) => {
   const query = `
     SELECT 
       j.kodeJemaat,
@@ -56,75 +54,47 @@ export const getAllJemaat = (req, res) => {
     LEFT JOIN dataPekerjaan pe ON j.kodeJemaat = pe.kodeJemaat
     LEFT JOIN dataPendeta dp ON j.kodeJemaat = dp.kodeJemaat
     LEFT JOIN dataRiwayatPendeta drp ON dp.kodePendeta = drp.kodePendeta
-
   `;
 
-db.query(query, (err, results) => {
-    if (err) {
-      console.error("❌ Error getAllJemaat:", err);
-      return res.status(500).json({ message: "Gagal mengambil data jemaat", err });
-    }
+  try {
+    // Gunakan await untuk query promise
+    const [results] = await db.query(query);
 
-    // Map untuk menampung data jemaat yang sudah dikelompokkan
-    const jemaatMap = {};
-    // Set untuk melacak ID yang sudah ditambahkan ke pendidikanList (mencegah duplikasi)
-//     const addedPendidikanIds = new Map(); 
-    // Set untuk melacak ID yang sudah ditambahkan ke riwayatPendetaList (mencegah duplikasi)
-    // CATATAN: Pastikan Anda menambahkan drp.kodeRiwayatPendeta di SELECT query SQL!
-    const addedRiwayatPendetaIds = new Map(); 
+    const jemaatMap = {};
+    const addedRiwayatPendetaIds = new Map();
 
-    results.forEach((row) => {
-      if (!jemaatMap[row.kodeJemaat]) {
-        jemaatMap[row.kodeJemaat] = {
-          ...row,
-//           pendidikanList: [],
-          riwayatPendetaList: []
-        };
-        // Inisialisasi Set pelacak ID untuk jemaat ini
-        // addedPendidikanIds.set(row.kodeJemaat, new Set());
+    results.forEach((row) => {
+      if (!jemaatMap[row.kodeJemaat]) {
+        jemaatMap[row.kodeJemaat] = {
+          ...row,
+          riwayatPendetaList: []
+        };
         addedRiwayatPendetaIds.set(row.kodeJemaat, new Set());
-      }
+      }
 
       const currentJemaat = jemaatMap[row.kodeJemaat];
-      
-//       // 1. De-duplikasi dan tambahkan Riwayat Pendidikan
-//       // Gunakan kodeRiwayatPendidikan sebagai kunci unik
-//       const pendidikanSet = addedPendidikanIds.get(row.kodeJemaat);
-//       if (row.kodeRiwayatPendidikan && pendidikanSet.has(row.kodeRiwayatPendidikan) === false) {
-//         currentJemaat.pendidikanList.push({
-//           kodeRiwayatPendidikan: row.kodeRiwayatPendidikan,
-//           jenjangPendidikan: row.jenjangPendidikan,
-//           namaInstitusi: row.namaInstitusi,
-//           tahunLulus: row.tahunLulus
-//         });
-//         // Tandai ID ini sudah dimasukkan
-//         pendidikanSet.add(row.kodeRiwayatPendidikan);
-//       }
-
-      // 2. De-duplikasi dan tambahkan Riwayat Pendeta
-      // Asumsi: Jika kodeRiwayatPendeta tidak ada di SELECT, ini tidak akan bekerja sempurna.
-      // Kita asumsikan ada kolom unik `drp.kodeRiwayatPendeta`
       const riwayatPendetaSet = addedRiwayatPendetaIds.get(row.kodeJemaat);
-      // Ganti `row.kodeRiwayatPendeta` dengan kunci unik yang Anda miliki di tabel dataRiwayatPendeta
-      if (row.namaGereja) { // Menggunakan namaGereja sebagai proxy karena ID tidak terlihat di SELECT query
+
+      if (row.namaGereja) {
         const uniqueKey = `${row.namaGereja}-${row.tahunMulai}-${row.tahunSelesai}`; 
-        
-        if (riwayatPendetaSet.has(uniqueKey) === false) {
-          currentJemaat.riwayatPendetaList.push({
-            namaGereja: row.namaGereja,
-            tahunMulai: row.tahunMulai,
-            tahunSelesai: row.tahunSelesai
-          });
-          // Tandai kombinasi ini sudah dimasukkan
+        if (!riwayatPendetaSet.has(uniqueKey)) {
+          currentJemaat.riwayatPendetaList.push({
+            namaGereja: row.namaGereja,
+            tahunMulai: row.tahunMulai,
+            tahunSelesai: row.tahunSelesai
+          });
           riwayatPendetaSet.add(uniqueKey);
         }
-      }
-      
-    });
+      }
+    });
 
-    res.json(Object.values(jemaatMap));
-  });
+    res.json(Object.values(jemaatMap));
+  } catch (error) {
+    console.error("❌ Error getAllJemaat:", error);
+    res.status(500).json({ message: "Gagal mengambil data jemaat", err: error.message });
+  }
 };
+
 
 
 
@@ -144,7 +114,7 @@ const formatDate = (dateStr) => {
 
 export const updateJemaat = async (req, res) => {
   const { kodeJemaat } = req.params;
-  const promisePool = db.promise();
+  const promisePool = db;
 
   try {
     // Ambil data lama
@@ -320,17 +290,15 @@ export const updateJemaat = async (req, res) => {
 
 
 // ===================================================
-// HAPUS JEMAAT TANPA SERTIFIKAT
+// HAPUS JEMAAT BESERTA DATA TERKAIT
 // ===================================================
 export const hapusJemaat = async (req, res) => {
   const { kodeJemaat } = req.params;
   if (!kodeJemaat) return res.status(400).json({ message: "kodeJemaat tidak diberikan" });
 
-  const promisePool = db.promise();
-
   try {
     // Ambil foto dari dataJemaat
-    const [rows] = await promisePool.query(
+    const [rows] = await db.query(
       `SELECT foto FROM dataJemaat WHERE kodeJemaat=?`,
       [kodeJemaat]
     );
@@ -352,35 +320,41 @@ export const hapusJemaat = async (req, res) => {
     ];
 
     for (const t of tablesWithKodeJemaat) {
-      await promisePool.query(`DELETE FROM ${t} WHERE kodeJemaat=?`, [kodeJemaat]);
+      await db.query(`DELETE FROM ${t} WHERE kodeJemaat=?`, [kodeJemaat]);
     }
 
-    // Cek apakah jemaat ini pendeta (dataPendeta punya kodeJemaat)
-    const [pendetaRows] = await promisePool.query(
+    // Cek apakah jemaat ini pendeta
+    const [pendetaRows] = await db.query(
       `SELECT kodePendeta FROM dataPendeta WHERE kodeJemaat=?`,
       [kodeJemaat]
     );
 
     if (pendetaRows.length) {
       const kodePendeta = pendetaRows[0].kodePendeta;
-      // Hapus dataRiwayatPendeta dan dataPendeta
-      await promisePool.query(`DELETE FROM dataRiwayatPendeta WHERE kodePendeta=?`, [kodePendeta]);
-      await promisePool.query(`DELETE FROM dataPendeta WHERE kodePendeta=?`, [kodePendeta]);
+
+      // Hapus dataRiwayatPendeta
+      await db.query(`DELETE FROM dataRiwayatPendeta WHERE kodePendeta=?`, [kodePendeta]);
+
+      // Hapus dataPendeta
+      await db.query(`DELETE FROM dataPendeta WHERE kodePendeta=?`, [kodePendeta]);
     }
 
     // Hapus data utama jemaat
-    await promisePool.query(`DELETE FROM dataJemaat WHERE kodeJemaat=?`, [kodeJemaat]);
+    await db.query(`DELETE FROM dataJemaat WHERE kodeJemaat=?`, [kodeJemaat]);
 
-    // Hapus foto
+    // Hapus file foto jika ada
     if (fotoPath) {
-      const absolute = path.join(process.cwd(), fotoPath);
-      if (fs.existsSync(absolute)) await unlink(absolute);
+      const absolutePath = path.join(process.cwd(), fotoPath);
+      if (fs.existsSync(absolutePath)) {
+        await unlink(absolutePath);
+      }
     }
 
     res.json({ message: "✅ Jemaat berhasil dihapus!" });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Gagal menghapus jemaat", err });
+    console.error("❌ Error hapusJemaat:", err);
+    res.status(500).json({ message: "Gagal menghapus jemaat", err: err.message });
   }
 };
 
@@ -420,7 +394,7 @@ export const tambahJemaat = async (req, res) => {
       ? `uploads/fotoProfil/${req.file.filename}`
       : "uploads/fotoProfil/undefined.png";
 
-    const promisePool = db.promise();
+    const promisePool = db;
 
     // 1️⃣ Insert data utama, ambil kodeJemaat auto increment
     const [result] = await promisePool.query(
