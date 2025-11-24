@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react"; // Tambahkan import ini
 import { useLocation, useNavigate } from "react-router-dom"; 
 // Pastikan Hapus: import { useParams } from "react-router-dom"; jika tidak digunakan
 import { NavbarComponent } from "../../../components/NavbarComponent";
+import { printSurat } from "../../../components/printSurat";
+
 
 const SuratTemplatePencalonanMajelis = () => {
     // 💡 SEMUA HOOK HARUS DI SINI (TOP LEVEL)
@@ -65,7 +67,7 @@ const SuratTemplatePencalonanMajelis = () => {
         // Pastikan Anda mengimpor printSurat
         // import { printSurat } from "../../../components/printSurat"; 
         printSurat(
-            "calon-majelis",
+            "surat-pencalonan-majelis",
             `Surat-Pencalonan_Majelis_${data.nama || "TanpaNama"}`
         );
     };

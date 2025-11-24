@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react"; // Tambahkan import ini
 import { useLocation, useNavigate } from "react-router-dom"; 
 // Pastikan Hapus: import { useParams } from "react-router-dom"; jika tidak digunakan
 import { NavbarComponent } from "../../../components/NavbarComponent";
+import { printSurat } from "../../../components/printSurat";
+
 
 const SuratTemplatePengakuanPercaya = () => {
     // 💡 SEMUA HOOK HARUS DI SINI (TOP LEVEL)
@@ -65,7 +67,7 @@ const SuratTemplatePengakuanPercaya = () => {
         // Pastikan Anda mengimpor printSurat
         // import { printSurat } from "../../../components/printSurat"; 
         printSurat(
-            "pengakuan-percaya",
+            "surat-pengakuan-percaya",
             `Surat-Pengakuan_Percaya_${data.nama || "TanpaNama"}`
         );
     };

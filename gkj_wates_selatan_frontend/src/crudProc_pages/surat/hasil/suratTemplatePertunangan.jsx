@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react"; // Tambahkan import ini
 import { useLocation, useNavigate } from "react-router-dom"; 
 // Pastikan Hapus: import { useParams } from "react-router-dom"; jika tidak digunakan
 import { NavbarComponent } from "../../../components/NavbarComponent";
+import { printSurat } from "../../../components/printSurat";
+
 
 const SuratTemplatePertunangan = () => {
     // 💡 SEMUA HOOK HARUS DI SINI (TOP LEVEL)
@@ -62,13 +64,12 @@ const SuratTemplatePertunangan = () => {
     };
 
     const handlePrint = () => {
-        // Pastikan Anda mengimpor printSurat
-        // import { printSurat } from "../../../components/printSurat"; 
-        printSurat( 
-            "surat-tunangan",
+        printSurat(
+            "surat-pertunangan",
             `Surat-Tunangan_${data.namaLaki || "TanpaNama"} dan ${data.namaPerempuan || "TanpaNama"}`
         );
     };
+
   return (
     <div>
       <NavbarComponent />

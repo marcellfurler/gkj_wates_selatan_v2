@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react"; // Tambahkan import ini
 import { useLocation, useNavigate } from "react-router-dom"; 
 // Pastikan Hapus: import { useParams } from "react-router-dom"; jika tidak digunakan
 import { NavbarComponent } from "../../../components/NavbarComponent";
+import { printSurat } from "../../../components/printSurat";
+
 
 const SuratTemplateBimbinganKatekisasi = () => {
     // 💡 SEMUA HOOK HARUS DI SINI (TOP LEVEL)

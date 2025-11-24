@@ -14,7 +14,7 @@ const router = express.Router();
 router.get("/", getSemuaSurat);
 
 // GET surat berdasarkan ID
-router.get("/:kodeDataSurat", getSuratById);
+// router.get("/:kodeDataSurat", getSuratById);
 
 // POST buat surat baru
 router.post("/", buatSuratBaru);

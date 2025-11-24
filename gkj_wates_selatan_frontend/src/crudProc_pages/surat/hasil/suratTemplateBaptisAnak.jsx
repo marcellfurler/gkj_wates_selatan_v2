@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react"; // Tambahkan import ini
 import { useLocation, useNavigate } from "react-router-dom"; 
 // Pastikan Hapus: import { useParams } from "react-router-dom"; jika tidak digunakan
 import { NavbarComponent } from "../../../components/NavbarComponent";
+import { printSurat } from "../../../components/printSurat";
+
 
 const SuratTemplateBaptisAnak = () => {
     // 💡 SEMUA HOOK HARUS DI SINI (TOP LEVEL)
@@ -61,14 +63,15 @@ const SuratTemplateBaptisAnak = () => {
         return date.toLocaleDateString("id-ID", options);
     };
 
+
+
     const handlePrint = () => {
-        // Pastikan Anda mengimpor printSurat
-        // import { printSurat } from "../../../components/printSurat"; 
-        printSurat(
-            "surat-baptis-anak",
-            `Surat-Permohonan-Baptis-Anak_${data.namaAnak || "TanpaNama"}`
-        );
-    };
+      printSurat(
+          "surat-baptis-anak",
+          `Surat-Permohonan-Baptis-Anak_${data.namaAnak || "TanpaNama"}`
+      );
+  };
+
 
     if (isLoading) {
         return (

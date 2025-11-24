@@ -144,13 +144,12 @@ export const NavbarComponent = () => {
                     style={{ fontSize: "1.1rem" }}
                   >
                     Hello, {namaLengkapUser?.split(" ")[0]} 👋
- 👋
                   </a>
 
                   <ul className="dropdown-menu dropdown-menu-end">
                     <li>
                       <Link className="dropdown-item" to="#">
-                        Informasi Admin
+                        Informasi {namaLengkapUser?.split(" ")[0]}
                       </Link>
                     </li>
                     <li>
