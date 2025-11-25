@@ -99,7 +99,7 @@ export const NavbarComponent = () => {
               </li>
 
               <li className="nav-item">
-                <Link className="nav-link" to="#" style={{ fontSize: "1.1rem" }}>
+                <Link className="nav-link" to="/statistik" style={{ fontSize: "1.1rem" }}>
                   Statistik
                 </Link>
               </li>

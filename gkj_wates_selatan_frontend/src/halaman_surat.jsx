@@ -164,7 +164,7 @@ const HalamanSurat = () => {
       kategori: "Kepengurusan dan Administrasi Gereja",
       surat: [
         { id: 9, nama: "Surat Kesanggupan Pencalonan Majelis", path: "/surat/calon-majelis" },
-        { id: 10, nama: "Surat Atestasi Pindah Gereja", path: "/surat/atestasi" },
+        // { id: 10, nama: "Surat Atestasi Pindah Gereja", path: "/surat/atestasi" },
       ],
     },
   ];

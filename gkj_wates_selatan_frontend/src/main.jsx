@@ -9,7 +9,8 @@ import HalamanData from './halaman_data_utama'
 import HalamanDetail from './crudProc_pages/halaman_detail'
 import HalamanEdit from './crudProc_pages/halaman_edit'
 import HalamanTambahDataBaru from './crudProc_pages/halaman_tambahDataBaru'
-import DetailPendeta from './crudProc_pages/halaman_detailPendeta'
+import HalamanStatistik from './halaman_statistik'
+
 
 import HalamanSurat from './halaman_surat'
 
@@ -57,7 +58,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/detail" element={<HalamanDetail />} />
         <Route path="/edit" element={<HalamanEdit />} />
         <Route path="/dataBaru" element={<HalamanTambahDataBaru />} />
-        <Route path="/detailPendeta" element={<DetailPendeta />} />
+        <Route path="/statistik" element={<HalamanStatistik />} />
+        
 
         {/* Bagian Surat */}
         <Route path="/surat" element={<HalamanSurat />} />
