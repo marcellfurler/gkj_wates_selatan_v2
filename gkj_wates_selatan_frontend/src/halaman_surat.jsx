@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { NavbarComponent } from "./components/NavbarComponent";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faSave, faArrowRight, faImage } from "@fortawesome/free-solid-svg-icons";
 
 /* === Komponen Daftar Surat Jemaat === */
 const DaftarSuratJemaat = () => {
@@ -224,7 +226,7 @@ const HalamanSurat = () => {
               className="btn btn-light btn-sm"
               onClick={() => navigate("/data")}
             >
-              ← Kembali
+              <FontAwesomeIcon icon={faArrowLeft} /> Kembali
             </button>
 
             <h4 className="mb-0 text-center flex-grow-1" style={{ color: "white" }}>

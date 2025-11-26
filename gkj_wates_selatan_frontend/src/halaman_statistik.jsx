@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { NavbarComponent } from "./components/NavbarComponent";
 import DoughnutChart from "./components/charts/doughnut";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
+
+import { faArrowLeft, faSave, faArrowRight, faImage } from "@fortawesome/free-solid-svg-icons";
 
 
 const HalamanStatistik = () => {
+    const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState("data"); // ⭐ TAB STATE
 
   const [totalJemaat, setTotalJemaat] = useState(0);
@@ -146,8 +152,18 @@ const HalamanStatistik = () => {
     <>
       <NavbarComponent />
       <div className="container mt-5 mb-3 ">
+        
 
-        <h2 className="fw-bold text-center">📊 Statistik Jemaat</h2>
+
+        <h2 className="fw-bold text-center">📊 Statistik Jemaat</h2>           
+        <button
+            className="btn btn-light btn-sm"
+            style={{ backgroundColor: "#004d97", color: "white" }}
+            onClick={() => navigate("/data")}
+        >
+            <FontAwesomeIcon icon={faArrowLeft} style={{ color: "white" }} /> Kembali
+        </button>
+
 
         {/* ============ NAV TABS ============ */}
         <ul className="nav nav-tabs mt-4">
