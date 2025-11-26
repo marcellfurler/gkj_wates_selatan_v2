@@ -1,0 +1,32 @@
+perlu liat perkembangan dari teknonya
+	keperluan data yang diperlukan untuk dimasukan
+	diperlukan orang asli, supaya tidak bisa di lacak orang (nanti palinagan 
+
+biasanya dengan insta
+
+Nanti pada halaman utamanya, ada untuk tambahkan data baru, dimana disitu akan diinputkan beberapa keperluan seperti yang di perlukan (sesuai kolom/ kebutuhan)
+
+Nanti, untuk keperluan lainnya, bisa dimasukan sesuai formnya
+
+Nanti missal statusnya menikah+baptis+sidi sesuai database (bisa di buat dropdown), maka dibuat penampilan form menampilkan inputan data pasangan
+
+
+
+
+info:
+
+nama., ttl, asla gereja, informasi sidi baptis nikah, nama keluarga, alamat.
+	- bisa dibuat untuk data statistik jemaat yg meninggal, lahir, dll
+	- nanti dibuat wilayah pelayanan dari gereja2 cabang. (ditambah kolom baru)
+	- nanti dibuat untuk data majelis dan orghanisasi gereja. (ganti untuk dari data gereja) 
+		- demografi dan statistik per wilayah (bisa di statistik
+dibuat untuk per jabatan (pendeta)
+
+
+
+untuk navbar:
+	home: untuk data secara umum
+	statistic: menampilkan data yang bisa diupdate (bisa di print)
+	organisasi: untuk data organisasi gereja (visualisasi data)
+	demografi: wilayah pelayanan gereja
+tambah data
