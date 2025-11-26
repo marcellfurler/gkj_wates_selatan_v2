@@ -98,11 +98,7 @@ export const NavbarComponent = () => {
                 </Link>
               </li>
 
-              <li className="nav-item">
-                <Link className="nav-link" to="/statistik" style={{ fontSize: "1.1rem" }}>
-                  Statistik
-                </Link>
-              </li>
+              
 
               
 
@@ -115,19 +111,27 @@ export const NavbarComponent = () => {
                   aria-expanded="false"
                   style={{ fontSize: "1.1rem" }}
                 >
-                  Visualisasi
+                  Statistik & Visualisasi
                 </a>
                 <ul className="dropdown-menu">
+                  <li>
+                    <Link className="dropdown-item" to="/statistik" >
+                      Statistik
+                    </Link>
+                  </li>
+
                   <li>
                     <Link className="dropdown-item" to="#">
                       Organisasi
                     </Link>
                   </li>
+                  
                   <li>
                     <Link className="dropdown-item" to="/demografi">
                       Demografi
                     </Link>
                   </li>
+                  
                 </ul>
               </li>
 

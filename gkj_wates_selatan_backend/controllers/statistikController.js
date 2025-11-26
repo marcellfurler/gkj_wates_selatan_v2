@@ -147,3 +147,59 @@ export const getStatistikNikah = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+export const getStatistikJenisKelamin = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT jenisKelamin, COUNT(*) AS jumlah
+      FROM dataJemaat
+      GROUP BY jenisKelamin
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error mengambil data jenis kelamin" });
+  }
+};
+
+
+// ============================
+// STATISTIK DEWASA & ANAK PER PEPANTHAN
+// ============================
+export const getPepanthanUsia = async (req, res) => {
+  try {
+    // Ambil semua pepanthan + jemaat + tanggal lahir
+    const [rows] = await db.query(`
+      SELECT p.namaPepanthan, j.kodeJemaat, j.tanggalLahir
+      FROM dataPepanthan p
+      LEFT JOIN dataJemaat j ON p.kodeJemaat = j.kodeJemaat
+      ORDER BY p.namaPepanthan
+    `);
+
+    // Kelompokkan per pepanthan
+    const map = {};
+    const result = [];
+
+    rows.forEach(row => {
+      if (!map[row.namaPepanthan]) {
+        map[row.namaPepanthan] = {
+          name: row.namaPepanthan,
+          rincian: []
+        };
+        result.push(map[row.namaPepanthan]);
+      }
+      if (row.tanggalLahir) {
+        map[row.namaPepanthan].rincian.push({
+          tanggalLahir: row.tanggalLahir
+        });
+      }
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error("Error getPepanthanUsia:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+

@@ -5,23 +5,17 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const DoughnutChart = ({ pepanthanData }) => {
-  // Ambil label (nama pepanthan)
-  const labels = pepanthanData.map(item => item.namaPepanthan);
-
-  // Ambil jumlah jemaat
-  const values = pepanthanData.map(item => item.jumlah);
+  // Labels & values dari prop
+  const labels = pepanthanData.map(item => item.name);
+  const values = pepanthanData.map(item => item.value);
+  const backgroundColors = pepanthanData.map(item => item.color);
 
   const data = {
-    labels: labels,
+    labels,
     datasets: [
       {
         data: values,
-        backgroundColor: [
-          "#1b75bc", // biru tua
-          "#2eb5e0", // biru muda
-          "#6cc24a", // hijau
-          "#f9a11b"  // orange
-        ],
+        backgroundColor: backgroundColors,
         borderWidth: 1,
       },
     ],
@@ -32,16 +26,19 @@ const DoughnutChart = ({ pepanthanData }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "bottom",
+        display: false, // legend kita buat custom di samping
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return `${context.label}: ${context.raw} orang`;
+          },
+        },
       },
     },
   };
 
-  return (
-    <div style={{ width: "400px", height: "400px", margin: "auto" }}>
-      <Doughnut data={data} options={options} />
-    </div>
-  );
+  return <Doughnut data={data} options={options} />;
 };
 
 export default DoughnutChart;

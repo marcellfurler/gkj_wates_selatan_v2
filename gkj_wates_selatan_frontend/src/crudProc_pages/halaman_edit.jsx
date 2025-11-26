@@ -216,6 +216,7 @@ const EditJemaat = () => {
                   <option value="AB">AB</option>
                   <option value="O">O</option>
                   <option value="B">B</option>
+                  <option value="Belum Diketahui">Belum Diketahui</option>
                 </select>
 
                 <label className="form-label fw-bold mt-3">Tanggal Lahir</label>
@@ -270,7 +271,9 @@ const EditJemaat = () => {
                     <label className="form-label fw-bold">Pepanthan</label>
                     <select name="namaPepanthan" value={formData.namaPepanthan} onChange={handleChange} className="form-select">
                       <option value="">Pilih...</option>
-                      <option value="Induk Depok">Induk Depok</option>
+                      <option value="Induk Depok Kelompok 1">Induk Depok Kelompok 1</option>
+                      <option value="Induk Depok Kelompok 2">Induk Depok Kelompok 2</option>
+                      <option value="Induk Depok Kelompok 3">Induk Depok Kelompok 3</option>
                       <option value="Triharjo">Triharjo</option>
                       <option value="Wonogiri">Wonogiri</option>
                       <option value="Galur">Galur</option>

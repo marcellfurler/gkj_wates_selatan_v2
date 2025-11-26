@@ -293,6 +293,7 @@ const HalamanTambahDataBaru = () => {
                     <option value="AB">AB</option>
                     <option value="O">O</option>
                     <option value="B">B</option>
+                    <option value="Belum Diketahui">Belum Diketahui</option>
                   </select>
 
                   <label className="form-label">
@@ -345,7 +346,9 @@ const HalamanTambahDataBaru = () => {
                     onChange={handleChange}
                   >
                     <option value="">-- Pilih --</option>
-                    <option value="Induk Depok">Induk Depok</option>
+                    <option value="Induk Depok Kelompok 1">Induk Depok Kelompok 1</option>
+                    <option value="Induk Depok Kelompok 2">Induk Depok Kelompok 2</option>
+                    <option value="Induk Depok Kelompok 3">Induk Depok Kelompok 3</option>
                     <option value="Triharjo">Triharjo</option>
                     <option value="Galur">Galur</option>
                     <option value="Wonogiri">Wonogiri</option>
@@ -391,7 +394,7 @@ const HalamanTambahDataBaru = () => {
                     <option value="Pendeta">Pendeta</option>
                     <option value="Majelis">Majelis</option>
                     <option value="Koordinator Pelayanan">Koordinator Pelayanan</option>
-                    <option value="Meninggal">Meninggal</option>
+                    {/* <option value="Meninggal">Meninggal</option> */}
                   </select>
 
                   <label className="form-label">Status Sidi</label>

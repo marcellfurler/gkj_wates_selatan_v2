@@ -1,51 +1,46 @@
 import React, { useEffect, useState } from "react";
 import { NavbarComponent } from "./components/NavbarComponent";
 import DoughnutChart from "./components/charts/doughnut";
+import BarChart from "./components/charts/barChart";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
-
-import { faArrowLeft, faSave, faArrowRight, faImage } from "@fortawesome/free-solid-svg-icons";
-
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 const HalamanStatistik = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState("data"); // ⭐ TAB STATE
+  const [activeTab, setActiveTab] = useState("data");
 
   const [totalJemaat, setTotalJemaat] = useState(0);
   const [pepanthanData, setPepanthanData] = useState([]);
+  const [genderData, setGenderData] = useState([]);
 
-  // Status Gerejawi
   const [nikahData, setNikahData] = useState(null);
   const [baptisData, setBaptisData] = useState(null);
   const [sidiData, setSidiData] = useState(null);
 
-    useEffect(() => {
+  useEffect(() => {
     const savedTab = localStorage.getItem("activeTabStatistik");
-    if (savedTab) {
-        setActiveTab(savedTab);
-    }
-    }, []);
+    if (savedTab) setActiveTab(savedTab);
+  }, []);
 
-    // 🔵 2. Fetch semua data
-    useEffect(() => {
+  useEffect(() => {
     fetchTotalJemaat();
-    fetchPepanthanData();
+    fetchPepanthanUsia(); // <-- ganti fetchPepanthanData
     fetchNikahData();
     fetchBaptisData();
     fetchSidiData();
-    }, []);
+    fetchGenderData();
+  }, []);
 
-  // =========================
-  // BACKEND FETCH
-  // =========================
+
   const fetchTotalJemaat = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/statistik/total");
       const data = await res.json();
       setTotalJemaat(data.total || 0);
     } catch (err) {
-      console.error("Error fetching total jemaat:", err);
+      console.error(err);
     }
   };
 
@@ -53,11 +48,56 @@ const HalamanStatistik = () => {
     try {
       const res = await fetch("http://localhost:5000/api/statistik/pepanthan");
       const data = await res.json();
-      setPepanthanData(data || []);
+
+      const warna = ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#004d97"];
+
+      const mapped = data.map((item, i) => ({
+        name: item.namaPepanthan,
+        value: item.jumlah,
+        color: warna[i % warna.length],
+        rincian: item.rincian || [], // pastikan disini ada array jemaat
+      }));
+
+      setPepanthanData(mapped);
     } catch (err) {
-      console.error("Error fetching pepanthan data:", err);
+      console.error(err);
     }
   };
+
+  const fetchPepanthanUsia = async () => {
+  try {
+    const res = await fetch("http://localhost:5000/api/statistik/pepanthan-usia");
+    const data = await res.json();
+
+    // Tambahkan warna (opsional) dan total value
+    const warna = ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f"];
+    const mapped = data.map((item, i) => ({
+      name: item.name,
+      color: warna[i % warna.length],
+      rincian: item.rincian,
+      value: item.rincian.length
+    }));
+
+    setPepanthanData(mapped);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+
+
+
+  const fetchGenderData = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/statistik/jenisKelamin");
+      const data = await res.json();
+      setGenderData(data); // pastikan objek: { jenisKelamin: "Laki-laki", jumlah: 30 }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
 
   const fetchNikahData = async () => {
     try {
@@ -65,7 +105,7 @@ const HalamanStatistik = () => {
       const data = await res.json();
       setNikahData(data);
     } catch (err) {
-      console.error("Error fetching nikah data:", err);
+      console.error(err);
     }
   };
 
@@ -75,7 +115,7 @@ const HalamanStatistik = () => {
       const data = await res.json();
       setBaptisData(data);
     } catch (err) {
-      console.error("Error fetching baptis data:", err);
+      console.error(err);
     }
   };
 
@@ -85,40 +125,39 @@ const HalamanStatistik = () => {
       const data = await res.json();
       setSidiData(data);
     } catch (err) {
-      console.error("Error fetching sidi data:", err);
+      console.error(err);
     }
   };
 
-  // =========================
-  // RENDER SUB TABEL STATUS
-  // =========================
   const renderStatusTable = (title, data, type) => {
-    if (!data) {
+    if (!data)
       return (
         <div className="card shadow-sm my-4">
           <div className="card-body text-center">Memuat data...</div>
         </div>
       );
-    }
 
     const sudah = type === "nikah" ? data.nikah : data.sudah;
-    // const belum = type === "nikah" ? data.belumNikah : data.belum;
+    const belum = type === "nikah" ? data.belumNikah : data.belum; 
+
     const rincian = data.rincianPepanthan || [];
 
     return (
       <div className="card shadow-sm my-4">
-         <div className="card-header text-white" style={{ backgroundColor: "#004d97" }}>
+        <div className="card-header text-white" style={{ backgroundColor: "#004d97" }}>
           <h5 className="mb-0">{title}</h5>
         </div>
         <div className="card-body">
           <p>
-            Informasi Jemaat yang sudah {type === "nikah" ? "Nikah" : type === "baptis" ? "Baptis" : "Sidi"}: 
-            <b> {sudah} orang</b>
-        </p>
+            Informasi Jemaat yang sudah {type === "nikah" ? "Nikah" : type === "baptis" ? "Baptis" : "Sidi"}:{" "}
+            <b>{sudah} orang</b>
+          </p>
+          <p>
+            Informasi Jemaat yang belum {type === "nikah" ? "Nikah" : type === "baptis" ? "Baptis" : "Sidi"}:{" "}
+            <b>{belum} orang</b>
+          </p>
 
-        
           <h6 className="mt-3 fw-bold">Rincian per Pepanthan:</h6>
-
           <table className="table table-bordered text-center">
             <thead>
               <tr>
@@ -128,19 +167,19 @@ const HalamanStatistik = () => {
               </tr>
             </thead>
             <tbody>
-              {rincian.length > 0 ? (
-                rincian.map((item, idx) => (
-                  <tr key={idx}>
-                    <td>{idx + 1}</td>
-                    <td>{item.namaPepanthan}</td>
-                    <td>{item.jumlah}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3">Tidak ada data</td>
-                </tr>
-              )}
+              {rincian.length > 0
+                ? rincian.map((item, idx) => (
+                    <tr key={idx}>
+                      <td>{idx + 1}</td>
+                      <td>{item.namaPepanthan}</td>
+                      <td>{item.jumlah}</td>
+                    </tr>
+                  ))
+                : (
+                    <tr>
+                      <td colSpan="3">Tidak ada data</td>
+                    </tr>
+                  )}
             </tbody>
           </table>
         </div>
@@ -151,62 +190,53 @@ const HalamanStatistik = () => {
   return (
     <>
       <NavbarComponent />
-      <div className="container mt-5 mb-3 ">
-        
-
-
-        <h2 className="fw-bold text-center">📊 Statistik Jemaat</h2>           
+      <div className="container mt-5 mb-3">
+        <h2 className="fw-bold text-center">📊 Statistik Jemaat</h2>
         <button
-            className="btn btn-light btn-sm"
-            style={{ backgroundColor: "#004d97", color: "white" }}
-            onClick={() => navigate("/data")}
+          className="btn btn-light btn-sm mb-3"
+          style={{ backgroundColor: "#004d97", color: "white" }}
+          onClick={() => navigate("/data")}
         >
-            <FontAwesomeIcon icon={faArrowLeft} style={{ color: "white" }} /> Kembali
+          <FontAwesomeIcon icon={faArrowLeft} style={{ color: "white" }} /> Kembali
         </button>
 
-
-        {/* ============ NAV TABS ============ */}
         <ul className="nav nav-tabs mt-4">
-        <li className="nav-item">
+          <li className="nav-item">
             <button
-            className={`nav-link ${activeTab === "data" ? "active" : ""}`}
-            onClick={() => {
+              className={`nav-link ${activeTab === "data" ? "active" : ""}`}
+              onClick={() => {
                 setActiveTab("data");
                 localStorage.setItem("activeTabStatistik", "data");
-            }}
+              }}
             >
-            📑 Data Statistik
+              📑 Data Statistik
             </button>
-        </li>
-
-        <li className="nav-item">
+          </li>
+          <li className="nav-item">
             <button
-            className={`nav-link ${activeTab === "visual" ? "active" : ""}`}
-            onClick={() => {
+              className={`nav-link ${activeTab === "visual" ? "active" : ""}`}
+              onClick={() => {
                 setActiveTab("visual");
                 localStorage.setItem("activeTabStatistik", "visual");
-            }}
+              }}
             >
-            📈 Visual Statistik
+              📈 Visual Statistik
             </button>
-        </li>
+          </li>
         </ul>
-
-        {/* ===================== TAB CONTENT ===================== */}
 
         {activeTab === "data" && (
           <>
-            {/* TOTAL JEMAAT */}
+            {/* Total Jemaat */}
             <div className="card shadow-sm my-4">
               <div className="card-body">
                 <h4 className="mb-0">
-                  Total Jemaat:{" "}
-                  <span className="text-primary fw-bold">{totalJemaat}</span>
+                  Total Jemaat: <span className="text-primary fw-bold">{totalJemaat}</span>
                 </h4>
               </div>
             </div>
 
-            {/* TABEL PEPANTHAN */}
+            {/* Jumlah Jemaat per Pepanthan */}
             <div className="card shadow-sm">
               <div className="card-header text-white" style={{ backgroundColor: "#004d97" }}>
                 <h5 className="mb-0">Jumlah Jemaat per Pepanthan</h5>
@@ -221,48 +251,132 @@ const HalamanStatistik = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {pepanthanData.length === 0 ? (
-                      <tr>
-                        <td colSpan="3" className="py-3">Memuat data...</td>
-                      </tr>
-                    ) : (
-                      pepanthanData.map((item, idx) => (
+                    {pepanthanData.length === 0
+                      ? <tr><td colSpan="3" className="py-3">Memuat data...</td></tr>
+                      : pepanthanData.map((item, idx) => (
                         <tr key={idx}>
                           <td>{idx + 1}</td>
-                          <td>{item.namaPepanthan || "-"}</td>
-                          <td className="fw-bold">{item.jumlah}</td>
+                          <td>{item.name}</td>
+                          <td>{item.value} orang</td>
                         </tr>
                       ))
-                    )}
+                    }
                   </tbody>
                 </table>
               </div>
             </div>
 
-            {/* REKAP STATUS */}
+            {/* Tabel Rincian Dewasa & Anak per Pepanthan */}
+            <div className="card shadow-sm my-4">
+              <div className="card-header text-white" style={{ backgroundColor: "#004d97" }}>
+                <h5 className="mb-0">Rincian Jemaat Dewasa & Anak per Pepanthan</h5>
+              </div>
+              <div className="card-body p-0">
+                <table className="table table-bordered mb-0 text-center">
+                  <thead className="table-light">
+                    <tr>
+                      <th>No</th>
+                      <th>Pepanthan</th>
+                      <th>Dewasa</th>
+                      <th>Anak (17 tahun kebawah)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pepanthanData.length === 0
+                      ? <tr><td colSpan="4" className="py-3">Memuat data...</td></tr>
+                      : pepanthanData.map((pepanthan, idx) => {
+                          const dewasa = pepanthan.rincian.filter(j => {
+                            if (!j.tanggalLahir) return false;
+                            const umur = Math.floor((new Date() - new Date(j.tanggalLahir)) / (1000*60*60*24*365.25));
+                            return umur >= 17;
+                          }).length;
+
+                          const anak = pepanthan.rincian.filter(j => {
+                            if (!j.tanggalLahir) return false;
+                            const umur = Math.floor((new Date() - new Date(j.tanggalLahir)) / (1000*60*60*24*365.25));
+                            return umur < 17;
+                          }).length;
+
+
+                          return (
+                            <tr key={idx}>
+                              <td>{idx + 1}</td>
+                              <td>{pepanthan.name}</td>
+                              <td>{dewasa} orang</td>
+                              <td>{anak} orang</td>
+                            </tr>
+                          );
+                        })
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Status Gerejawi */}
             <h3 className="fw-bold mt-5">📌 Rekapitulasi Status Gerejawi</h3>
-                <div className="row">
-                <div className="col-md-4">
-                    {renderStatusTable("Status Nikah", nikahData, "nikah")}
-                </div>
-                <div className="col-md-4">
-                    {renderStatusTable("Status Baptis", baptisData, "baptis")}
-                </div>
-                <div className="col-md-4">
-                    {renderStatusTable("Status Sidi", sidiData, "sidi")}
-                </div>
-                </div>
+            <div className="row">
+              <div className="col-md-4">{renderStatusTable("Status Nikah", nikahData, "nikah")}</div>
+              <div className="col-md-4">{renderStatusTable("Status Baptis", baptisData, "baptis")}</div>
+              <div className="col-md-4">{renderStatusTable("Status Sidi", sidiData, "sidi")}</div>
+            </div>
           </>
         )}
 
-        {/* ===================== VISUAL TAB ===================== */}
-        {activeTab === "visual" && (
-            <div className="mt-4">
-                <h4 className="fw-bold mb-3 text-center">📊 Distribusi Jemaat per Pepanthan</h4>
 
-                {/* Chart Donut */}
-                <DoughnutChart pepanthanData={pepanthanData} />
+        {activeTab === "visual" && (
+          <div className="mt-4">
+            <h4 className="fw-bold mb-3 text-center">📊 Distribusi Jemaat</h4>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center", // agar konten berada di tengah
+                alignItems: "flex-start",
+                gap: "80px", // jarak antar chart
+                flexWrap: "wrap", // agar responsive di layar kecil
+              }}
+            >
+              {/* Doughnut Chart */}
+              <div style={{ textAlign: "center" }}>
+                <div style={{ width: "350px", height: "350px" }}>
+                  <DoughnutChart pepanthanData={pepanthanData} />
+                </div>
+                <h6 className="fw-bold mt-3">Legend Pepanthan:</h6>
+                {pepanthanData.length === 0
+                  ? <p>Memuat data...</p>
+                  : pepanthanData.map((item, idx) => (
+                      <div key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", justifyContent: "center" }}>
+                        <div style={{ width: "16px", height: "16px", borderRadius: "50%", backgroundColor: item.color }} />
+                        <span>{item.name}: {item.value} orang</span>
+                      </div>
+                    ))
+                }
+              </div>
+
+              {/* Bar Chart */}
+              <div style={{ textAlign: "center" }}>
+                <div style={{ width: "500px", height: "250px" }}>
+                  <BarChart genderData={genderData} />
+                </div>
+                <h6 className="fw-bold mt-3">Legend Jenis Kelamin:</h6>
+                {genderData.length === 0
+                  ? <p>Memuat data...</p>
+                  : genderData.map((item, idx) => (
+                      <div key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", justifyContent: "center" }}>
+                        <div style={{
+                          width: "16px",
+                          height: "16px",
+                          borderRadius: "50%",
+                          backgroundColor: idx === 0 ? "#4e79a7" : "#f28e2c"
+                        }} />
+                        <span>{item.jenisKelamin}: {item.jumlah} orang</span>
+                      </div>
+                    ))
+                }
+              </div>
             </div>
+          </div>
         )}
 
       </div>
