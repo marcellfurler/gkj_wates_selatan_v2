@@ -36,6 +36,47 @@ const formatTanggal = (tanggal) => {
   return new Date(tanggal).toLocaleDateString('id-ID', options);
 };
 
+
+const formatTanggalLahir = (tanggal) => {
+  if (!tanggal) return "-";
+
+  const date = new Date(tanggal);
+  const today = new Date();
+
+  // Format tanggal Indonesia
+  const tanggalLokal = date.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  // Hitung umur
+  let tahun = today.getFullYear() - date.getFullYear();
+  let bulan = today.getMonth() - date.getMonth();
+  let hari = today.getDate() - date.getDate();
+
+  // Jika hari negatif → pinjam hari dari bulan sebelumnya
+  if (hari < 0) {
+    // Ambil jumlah hari dari bulan sebelumnya
+    const bulanSebelumnya = new Date(today.getFullYear(), today.getMonth(), 0);
+    const jumlahHariBulanSebelumnya = bulanSebelumnya.getDate();
+
+    hari += jumlahHariBulanSebelumnya;
+    bulan -= 1;
+  }
+
+  // Jika bulan negatif → pinjam dari tahun
+  if (bulan < 0) {
+    tahun -= 1;
+    bulan += 12;
+  }
+
+  return `${tanggalLokal} (Usia: ${tahun} tahun ${bulan} bulan ${hari} hari)`;
+};
+
+
+
+
 // -----------------------------
 // 🌟 DETAIL PAGE COMPONENT
 // -----------------------------
@@ -44,7 +85,25 @@ const DetailJemaat = ({ data }) => {
 
   const dataPribadi = [
     { label: 'Nama Lengkap', value: data.namaLengkap || '-' },
-    { label: 'TTL', value: `${data.tempatLahir || '-'}, ${formatTanggal(data.tanggalLahir)}` },
+    {
+      label: 'Tempat, tanggal Lahir',
+      value: (() => {
+        const ttl = formatTanggalLahir(data.tanggalLahir);
+
+        // Pisahkan bagian sebelum dan dalam kurung
+        const [tanggal, usiaDalamKurung] = ttl.split(" (");
+
+        return (
+          <>
+            {data.tempatLahir || "-"}, {tanggal}
+            {" "}
+            <span style={{ fontStyle: "italic" }}>
+              ({usiaDalamKurung}
+            </span>
+          </>
+        );
+      })()
+    },
     { label: 'Jenis Kelamin', value: data.jenisKelamin || '-' },
     { label: 'Agama', value: data.agama || '-' },
     { label: 'Golongan Darah', value: data.golonganDarah || '-' },

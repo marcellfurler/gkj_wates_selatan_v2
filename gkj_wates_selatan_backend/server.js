@@ -9,6 +9,7 @@ import dataJemaatRoutes from "./routes/dataJemaatRoutes.js";
 import dataPendetaRoutes from "./routes/dataPendetaRoutes.js";
 import suratRoutes from "./routes/suratRoutes.js";
 import loginRoutes from "./routes/loginRoutes.js";
+import statistikRoutes from "./routes/statistikRoutes.js";
 
 const app = express();
 
@@ -34,6 +35,8 @@ app.use("/api/jemaat", dataJemaatRoutes);
 app.use("/api/pendeta", dataPendetaRoutes);
 app.use("/api/surat", suratRoutes);
 app.use("/api", loginRoutes);
+app.use("/api/statistik", statistikRoutes);
+
 
 // ================================
 // Route default test
