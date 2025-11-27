@@ -392,7 +392,7 @@ export const tambahJemaat = async (req, res) => {
     // Foto: pakai file multer atau default
     const foto = req.file
       ? `uploads/fotoProfil/${req.file.filename}`
-      : "uploads/fotoProfil/undefined.png";
+      : "uploads/fotoProfil/undefined/undefined.png";
 
     const promisePool = db;
 

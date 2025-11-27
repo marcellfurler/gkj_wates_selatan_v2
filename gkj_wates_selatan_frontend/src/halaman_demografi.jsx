@@ -1,119 +1,114 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import { NavbarComponent } from "./components/NavbarComponent";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
-const HalamanDemografi = () => {
-  const [pepanthanList, setPepanthanList] = useState([]);
-  const [selectedPepanthan, setSelectedPepanthan] = useState(null);
+// Import marker warna berbeda
+import blueMarker from "leaflet-color-markers/img/marker-icon-blue.png";
+import greenMarker from "leaflet-color-markers/img/marker-icon-green.png";
+import redMarker from "leaflet-color-markers/img/marker-icon-red.png";
+import orangeMarker from "leaflet-color-markers/img/marker-icon-orange.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-  useEffect(() => {
-    fetchPepanthan();
-  }, []);
+// Buat objek icon warna
+const colorIcons = {
+  blue: new L.Icon({ iconUrl: blueMarker, shadowUrl: markerShadow, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
+  green: new L.Icon({ iconUrl: greenMarker, shadowUrl: markerShadow, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
+  red: new L.Icon({ iconUrl: redMarker, shadowUrl: markerShadow, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
+  orange: new L.Icon({ iconUrl: orangeMarker, shadowUrl: markerShadow, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
+};
 
-  // AMBIL DATA JEMAAT PER PEPANTHAN
-  const fetchPepanthan = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/statistik/pepanthan");
-      const data = await res.json();
-      setPepanthanList(data.data);
-    } catch (err) {
-      console.error("Error fetching pepanthan:", err);
-    }
-  };
+// Data pepanthan / gereja
+const gerejaData = [
+  { 
+    nama: "GKJ Wates Selatan Induk Depok", 
+    lat: -7.910435, 
+    lng: 110.161520,
+    alamat: "Depok, Panjatan, Pandjatan, Panjatan, Kec. Panjatan, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55655",
+    warna: "blue"
+  },
+  { 
+    nama: "GKJ Wates Selatan Pepanthan Galur", 
+    lat: -7.948630, 
+    lng: 110.222001,
+    alamat: "Dukuh Kilung, Kranggan, Kec. Galur, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55661",
+    warna: "green"
+  },
+  { 
+    nama: "GKJ Wates Selatan Pepanthan Wonogiri", 
+    lat: -7.921278, 
+    lng: 110.219675,
+    alamat: "Wonogiri, Jatisari, Tegalsari, Jatirejo, Kec. Lendah, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55663",
+    warna: "red"
+  },
+  { 
+    nama: "GKJ Wates Selatan Triharjo",  
+    lat: -7.886425691696392, 
+    lng: 110.13346921691945,
+    alamat: "Triharjo, Kec. Wates, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta",
+    warna: "orange"
+  },
+];
 
-  // MAPS KOORDINAT (bisa kamu edit)
-  const mapsLocation = {
-    "DEPOK": "https://maps.app.goo.gl/Zck16h7pKKjPG5Xz8",
-    "WONOGIRI": "https://www.google.com/maps?q=Wonogiri",
-    "GALUR": "https://www.google.com/maps?q=Galur+Kulon+Progo",
-    "TRIHIHARJO": "https://www.google.com/maps?q=Triharjo+Kulon+Progo"
-  };
+const HalamanPeta = () => {
+  const navigate = useNavigate();
 
   return (
     <>
       <NavbarComponent />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "90vh",
+          padding: "10px",
+        }}
+        className="container mt-5 mb-3"
+      >
+        <button
+          className="btn btn-light btn-sm mb-2"
+          style={{ alignSelf: "flex-start", backgroundColor: "#004d97", color: "white" }}
+          onClick={() => navigate("/data")}
+        >
+          <FontAwesomeIcon icon={faArrowLeft} /> Kembali
+        </button>
 
-      <div className="container mt-4 mb-5">
-        <h2 className="fw-bold">🗺️ Demografi Pepanthan</h2>
-        <p className="text-muted">Informasi lokasi dan statistik singkat setiap pepanthan.</p>
+        <h3 className="text-center mb-4">
+          Peta Persebaran Pelayanan GKJ Wates Selatan
+        </h3>
 
-        <div className="row mt-4">
-          {pepanthanList.map((item, idx) => (
-            <div key={idx} className="col-md-4 mb-4">
-              <div className="card shadow-sm h-100">
-                <div className="card-body">
-                  <h5 className="card-title fw-bold">
-                    {item.namaPepanthan || "Tidak diketahui"}
-                  </h5>
-
-                  <p className="card-text text-muted">
-                    Jumlah Jemaat: <span className="fw-bold">{item.jumlah}</span>
-                  </p>
-
-                  <div className="d-flex gap-2">
-                    {/* LINK GOOGLE MAPS */}
-                    <a
-                      href={mapsLocation[item.namaPepanthan] || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-primary btn-sm"
-                    >
-                      📍 Lihat Lokasi
-                    </a>
-
-                    {/* POPUP STATISTIK */}
-                    <button
-                      className="btn btn-success btn-sm"
-                      onClick={() => setSelectedPepanthan(item)}
-                    >
-                      📊 Statistik
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* POPUP MODAL */}
-        {selectedPepanthan && (
-          <div
-            className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        <div style={{ width: "80%", height: "70vh" }}>
+          <MapContainer
+            center={[-7.925, 110.190]} // Pusat map di tengah semua marker
+            zoom={13}
+            scrollWheelZoom={true}
+            style={{ width: "100%", height: "100%" }}
           >
-            <div className="modal-dialog">
-              <div className="modal-content">
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            />
 
-                <div className="modal-header">
-                  <h5 className="modal-title fw-bold">
-                    Statistik {selectedPepanthan.namaPepanthan}
-                  </h5>
-                  <button
-                    className="btn-close"
-                    onClick={() => setSelectedPepanthan(null)}
-                  ></button>
-                </div>
-
-                <div className="modal-body">
-                  <p className="mb-1"><strong>Pepanthan:</strong> {selectedPepanthan.namaPepanthan}</p>
-                  <p><strong>Jumlah Jemaat:</strong> {selectedPepanthan.jumlah}</p>
-                </div>
-
-                <div className="modal-footer">
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => setSelectedPepanthan(null)}
-                  >
-                    Tutup
-                  </button>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        )}
+            {gerejaData.map((g, i) => (
+              <Marker key={i} position={[g.lat, g.lng]} icon={colorIcons[g.warna]}>
+                <Popup>
+                  <strong>{g.nama}</strong>
+                  <br />
+                  Alamat: {g.alamat}
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+        </div>
       </div>
     </>
   );
 };
 
-export default HalamanDemografi;
+export default HalamanPeta;

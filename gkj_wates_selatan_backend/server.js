@@ -36,6 +36,8 @@ app.use("/api/pendeta", dataPendetaRoutes);
 app.use("/api/surat", suratRoutes);
 app.use("/api", loginRoutes);
 app.use("/api/statistik", statistikRoutes);
+app.use("/api/admin", loginRoutes);
+
 
 
 // ================================

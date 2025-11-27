@@ -203,3 +203,56 @@ export const getPepanthanUsia = async (req, res) => {
   }
 };
 
+/* ============================
+   STATISTIK MENINGGAL
+============================ */
+export const getStatistikMeninggal = async (req, res) => {
+  try {
+    // Total jemaat meninggal
+    const [[total]] = await db.query(`
+      SELECT COUNT(*) AS total
+      FROM dataPelayanan
+      WHERE namaPelayanan = 'Meninggal'
+    `);
+
+    // Rincian per pepanthan
+    const [rincian] = await db.query(`
+      SELECT p.namaPepanthan, COUNT(j.kodeJemaat) AS jumlah
+      FROM dataPelayanan j
+      JOIN dataPepanthan p ON j.kodeJemaat = p.kodeJemaat
+      WHERE j.namaPelayanan = 'Meninggal'
+      GROUP BY p.namaPepanthan
+      ORDER BY jumlah DESC
+    `);
+
+    res.json({
+      total: total.total,
+      rincianPepanthan: rincian
+    });
+  } catch (err) {
+    console.error("Error getStatistikMeninggal:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// const pool = require("../db"); // koneksi MySQL
+
+// Controller untuk mengambil list tahun dari dataJemaat
+export const getListTahun = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT DISTINCT YEAR(tanggalDaftar) AS tahun
+      FROM dataJemaat
+      ORDER BY tahun DESC
+    `);
+
+
+    const listTahun = rows.map(r => r.tahun);
+    res.json(listTahun);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Gagal mengambil list tahun" });
+  }
+};
+
+

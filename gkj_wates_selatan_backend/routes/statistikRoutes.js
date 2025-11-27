@@ -7,6 +7,8 @@ import {
   getStatistikNikah,
   getStatistikJenisKelamin,
   getPepanthanUsia,
+  getStatistikMeninggal,
+  getListTahun
 } from "../controllers/statistikController.js";
 
 const router = express.Router();
@@ -19,6 +21,8 @@ router.get("/sidi", getStatistikSidi);
 router.get("/nikah", getStatistikNikah);
 router.get("/jenisKelamin", getStatistikJenisKelamin);
 router.get("/pepanthan-usia", getPepanthanUsia);
+router.get("/meninggal", getStatistikMeninggal);
+router.get("/tahun", getListTahun);
 
 
 export default router;

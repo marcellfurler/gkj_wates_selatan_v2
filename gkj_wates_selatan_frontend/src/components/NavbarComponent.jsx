@@ -1,16 +1,18 @@
+
+
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import logoGKJ from "../assets/logoGKJ.png";
 
 export const NavbarComponent = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // cek apakah user login
   const token = localStorage.getItem("token");
-  const username = localStorage.getItem("username");
   const namaLengkapUser = localStorage.getItem("namaLengkapUser");
 
-  // function logout
+  // fungsi logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
@@ -19,6 +21,18 @@ export const NavbarComponent = () => {
     alert("Logout berhasil!");
     navigate("/");
   };
+
+  // helper untuk style active menu
+  const isActiveExact = (path) => location.pathname === path;
+  const isActiveStartsWith = (path) => location.pathname.startsWith(path);
+
+  const linkStyle = (active) => ({
+    fontSize: "1.1rem",
+    color: active ? "white" : "#004d99",
+    backgroundColor: active ? "#004d97" : "transparent",
+    borderRadius: active ? "5px" : "0px",
+    transition: "0.3s",
+  });
 
   return (
     <header>
@@ -80,28 +94,27 @@ export const NavbarComponent = () => {
             }}
           >
             <ul className="navbar-nav ms-auto">
+
+              {/* Menu Biasa */}
               <li className="nav-item">
-                <Link className="nav-link" to="/data" style={{ fontSize: "1.1rem" }}>
+                <Link className="nav-link" to="/data" style={linkStyle(isActiveExact("/data"))}>
                   Data
                 </Link>
               </li>
 
               <li className="nav-item">
-                <Link className="nav-link" to="/surat" style={{ fontSize: "1.1rem" }}>
-                  Surat
-                </Link>
-              </li>
-
-              <li className="nav-item">
-                <Link className="nav-link" to="/dataBaru" style={{ fontSize: "1.1rem" }}>
+                <Link className="nav-link" to="/dataBaru" style={linkStyle(isActiveExact("/dataBaru"))}>
                   Data Baru
                 </Link>
               </li>
 
-              
+              <li className="nav-item">
+                <Link className="nav-link" to="/surat" style={linkStyle(isActiveExact("/surat"))}>
+                  Surat
+                </Link>
+              </li>
 
-              
-
+              {/* Dropdown Statistik & Visualisasi */}
               <li className="nav-item dropdown">
                 <a
                   className="nav-link dropdown-toggle"
@@ -109,33 +122,23 @@ export const NavbarComponent = () => {
                   role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
-                  style={{ fontSize: "1.1rem" }}
+                  style={linkStyle(isActiveStartsWith("/statistik") || isActiveStartsWith("/demografi"))}
                 >
                   Statistik & Visualisasi
                 </a>
                 <ul className="dropdown-menu">
                   <li>
-                    <Link className="dropdown-item" to="/statistik" >
+                    <Link className="dropdown-item" to="/statistik">
                       Statistik
                     </Link>
                   </li>
-
-                  <li>
-                    <Link className="dropdown-item" to="#">
-                      Organisasi
-                    </Link>
-                  </li>
-                  
                   <li>
                     <Link className="dropdown-item" to="/demografi">
                       Demografi
                     </Link>
                   </li>
-                  
                 </ul>
               </li>
-
-              
 
               {/* Dropdown admin */}
               {token ? (
@@ -149,25 +152,27 @@ export const NavbarComponent = () => {
                   >
                     Hello, {namaLengkapUser?.split(" ")[0]} 👋
                   </a>
-
                   <ul className="dropdown-menu dropdown-menu-end">
                     <li>
-                      <Link className="dropdown-item" to="#">
+                      <Link className="dropdown-item" to="/informasiAdmin">
                         Informasi {namaLengkapUser?.split(" ")[0]}
                       </Link>
                     </li>
+
                     <li>
-                      <button
-                        className="dropdown-item text-danger"
-                        onClick={handleLogout}
-                      >
+                      <Link className="dropdown-item text-success" to="/developer">
+                        Developer
+                      </Link>
+                    </li>
+
+                    <li>
+                      <button className="dropdown-item text-danger" onClick={handleLogout}>
                         Logout
                       </button>
                     </li>
                   </ul>
                 </li>
               ) : (
-                // Jika belum login → tampilkan tombol login
                 <li className="nav-item">
                   <Link className="nav-link" to="/login" style={{ fontSize: "1.1rem" }}>
                     Login
@@ -181,6 +186,7 @@ export const NavbarComponent = () => {
     </header>
   );
 };
+
 
 // Navbar khusus halaman login (tanpa menu)
 export const NavbarComponentLogin = () => (

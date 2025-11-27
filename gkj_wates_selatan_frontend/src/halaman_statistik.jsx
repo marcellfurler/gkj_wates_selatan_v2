@@ -18,25 +18,44 @@ const HalamanStatistik = () => {
   const [nikahData, setNikahData] = useState(null);
   const [baptisData, setBaptisData] = useState(null);
   const [sidiData, setSidiData] = useState(null);
+  const [meninggalData, setMeninggalData] = useState(null);
+
+  // ===== Tambahan untuk filter tahun =====
+  const [listTahun, setListTahun] = useState([]);
+  const [tahunTerpilih, setTahunTerpilih] = useState(new Date().getFullYear());
 
   useEffect(() => {
     const savedTab = localStorage.getItem("activeTabStatistik");
     if (savedTab) setActiveTab(savedTab);
+    fetchListTahun();
   }, []);
 
-  useEffect(() => {
-    fetchTotalJemaat();
-    fetchPepanthanUsia(); // <-- ganti fetchPepanthanData
-    fetchNikahData();
-    fetchBaptisData();
-    fetchSidiData();
-    fetchGenderData();
-  }, []);
-
-
-  const fetchTotalJemaat = async () => {
+  // ===== Fetch list tahun =====
+  const fetchListTahun = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/statistik/total");
+      const res = await fetch("http://localhost:5000/api/statistik/tahun");
+      const data = await res.json(); // data = [2025, 2024, 2023, ...]
+      setListTahun(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ===== Fetch data tiap kali tahunTerpilih berubah =====
+  useEffect(() => {
+    fetchTotalJemaat(tahunTerpilih);
+    fetchPepanthanUsia(tahunTerpilih);
+    fetchNikahData(tahunTerpilih);
+    fetchBaptisData(tahunTerpilih);
+    fetchSidiData(tahunTerpilih);
+    fetchGenderData(tahunTerpilih);
+    fetchMeninggalData(tahunTerpilih);
+  }, [tahunTerpilih]);
+
+  // ===== Fetch functions dengan parameter tahun =====
+  const fetchTotalJemaat = async (tahun) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/statistik/total?tahun=${tahun}`);
       const data = await res.json();
       setTotalJemaat(data.total || 0);
     } catch (err) {
@@ -44,9 +63,9 @@ const HalamanStatistik = () => {
     }
   };
 
-  const fetchPepanthanData = async () => {
+  const fetchPepanthanData = async (tahun) => {
     try {
-      const res = await fetch("http://localhost:5000/api/statistik/pepanthan");
+      const res = await fetch(`http://localhost:5000/api/statistik/pepanthan?tahun=${tahun}`);
       const data = await res.json();
 
       const warna = ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#004d97"];
@@ -55,7 +74,7 @@ const HalamanStatistik = () => {
         name: item.namaPepanthan,
         value: item.jumlah,
         color: warna[i % warna.length],
-        rincian: item.rincian || [], // pastikan disini ada array jemaat
+        rincian: item.rincian || [],
       }));
 
       setPepanthanData(mapped);
@@ -64,44 +83,38 @@ const HalamanStatistik = () => {
     }
   };
 
-  const fetchPepanthanUsia = async () => {
-  try {
-    const res = await fetch("http://localhost:5000/api/statistik/pepanthan-usia");
-    const data = await res.json();
-
-    // Tambahkan warna (opsional) dan total value
-    const warna = ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f"];
-    const mapped = data.map((item, i) => ({
-      name: item.name,
-      color: warna[i % warna.length],
-      rincian: item.rincian,
-      value: item.rincian.length
-    }));
-
-    setPepanthanData(mapped);
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-
-
-
-
-  const fetchGenderData = async () => {
+  const fetchPepanthanUsia = async (tahun) => {
     try {
-      const res = await fetch("http://localhost:5000/api/statistik/jenisKelamin");
+      const res = await fetch(`http://localhost:5000/api/statistik/pepanthan-usia?tahun=${tahun}`);
       const data = await res.json();
-      setGenderData(data); // pastikan objek: { jenisKelamin: "Laki-laki", jumlah: 30 }
+
+      const warna = ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f"];
+      const mapped = data.map((item, i) => ({
+        name: item.name,
+        color: warna[i % warna.length],
+        rincian: item.rincian,
+        value: item.rincian.length
+      }));
+
+      setPepanthanData(mapped);
     } catch (err) {
       console.error(err);
     }
   };
 
-
-  const fetchNikahData = async () => {
+  const fetchGenderData = async (tahun) => {
     try {
-      const res = await fetch("http://localhost:5000/api/statistik/nikah");
+      const res = await fetch(`http://localhost:5000/api/statistik/jenisKelamin?tahun=${tahun}`);
+      const data = await res.json();
+      setGenderData(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchNikahData = async (tahun) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/statistik/nikah?tahun=${tahun}`);
       const data = await res.json();
       setNikahData(data);
     } catch (err) {
@@ -109,9 +122,9 @@ const HalamanStatistik = () => {
     }
   };
 
-  const fetchBaptisData = async () => {
+  const fetchBaptisData = async (tahun) => {
     try {
-      const res = await fetch("http://localhost:5000/api/statistik/baptis");
+      const res = await fetch(`http://localhost:5000/api/statistik/baptis?tahun=${tahun}`);
       const data = await res.json();
       setBaptisData(data);
     } catch (err) {
@@ -119,9 +132,9 @@ const HalamanStatistik = () => {
     }
   };
 
-  const fetchSidiData = async () => {
+  const fetchSidiData = async (tahun) => {
     try {
-      const res = await fetch("http://localhost:5000/api/statistik/sidi");
+      const res = await fetch(`http://localhost:5000/api/statistik/sidi?tahun=${tahun}`);
       const data = await res.json();
       setSidiData(data);
     } catch (err) {
@@ -129,17 +142,70 @@ const HalamanStatistik = () => {
     }
   };
 
-  const renderStatusTable = (title, data, type) => {
-    if (!data)
-      return (
-        <div className="card shadow-sm my-4">
-          <div className="card-body text-center">Memuat data...</div>
+  const fetchMeninggalData = async (tahun) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/statistik/meninggal?tahun=${tahun}`);
+      const data = await res.json();
+      setMeninggalData(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const renderMeninggalTable = (data) => {
+    if (!data) return (
+      <div className="card shadow-sm my-4">
+        <div className="card-body text-center">Memuat data...</div>
+      </div>
+    );
+
+    const total = data.total || 0;
+    const rincian = data.rincianPepanthan || [];
+
+    return (
+      <div className="card shadow-sm my-4">
+        <div className="card-header text-white" style={{ backgroundColor: "#004d97" }}>
+          <h5 className="mb-0">Jemaat Meninggal</h5>
         </div>
-      );
+        <div className="card-body">
+          <p>Total jemaat yang meninggal: <b>{total} orang</b></p>
+
+          <h6 className="mt-3 fw-bold">Rincian per Pepanthan:</h6>
+          <table className="table table-bordered text-center">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Pepanthan</th>
+                <th>Jumlah</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rincian.length > 0
+                ? rincian.map((item, idx) => (
+                    <tr key={idx}>
+                      <td>{idx + 1}</td>
+                      <td>{item.namaPepanthan}</td>
+                      <td>{item.jumlah}</td>
+                    </tr>
+                  ))
+                : <tr><td colSpan="3">Tidak ada data</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
+  const renderStatusTable = (title, data, type) => {
+    if (!data) return (
+      <div className="card shadow-sm my-4">
+        <div className="card-body text-center">Memuat data...</div>
+      </div>
+    );
 
     const sudah = type === "nikah" ? data.nikah : data.sudah;
     const belum = type === "nikah" ? data.belumNikah : data.belum; 
-
     const rincian = data.rincianPepanthan || [];
 
     return (
@@ -175,11 +241,8 @@ const HalamanStatistik = () => {
                       <td>{item.jumlah}</td>
                     </tr>
                   ))
-                : (
-                    <tr>
-                      <td colSpan="3">Tidak ada data</td>
-                    </tr>
-                  )}
+                : <tr><td colSpan="3">Tidak ada data</td></tr>
+              }
             </tbody>
           </table>
         </div>
@@ -199,6 +262,27 @@ const HalamanStatistik = () => {
         >
           <FontAwesomeIcon icon={faArrowLeft} style={{ color: "white" }} /> Kembali
         </button>
+
+        {/* ===== Filter Tahun (Dropdown) ===== */}
+        <div className="mb-3">
+          <label className="fw-bold me-2">Filter Tahun:</label>
+          {listTahun.length === 0 ? (
+            <span>Memuat tahun...</span>
+          ) : (
+            <select
+              className="form-select d-inline-block w-auto"
+              value={tahunTerpilih}
+              onChange={(e) => setTahunTerpilih(parseInt(e.target.value))}
+            >
+              {listTahun.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
 
         <ul className="nav nav-tabs mt-4">
           <li className="nav-item">
@@ -230,43 +314,74 @@ const HalamanStatistik = () => {
             {/* Total Jemaat */}
             <div className="card shadow-sm my-4">
               <div className="card-body">
-                <h4 className="mb-0">
+                <h4 className="mb-3">
                   Total Jemaat: <span className="text-primary fw-bold">{totalJemaat}</span>
                 </h4>
+
+                <h5>
+                  Total Jemaat yang masih hidup:{" "}
+                  <span className="text-success fw-bold">
+                    {totalJemaat - (meninggalData?.total || 0)}
+                  </span>
+                </h5>
+
+                <h5>
+                  Total Jemaat yang sudah meninggal:{" "}
+                  <span className="text-danger fw-bold">
+                    {meninggalData?.total || 0}
+                  </span>
+                </h5>
               </div>
             </div>
 
-            {/* Jumlah Jemaat per Pepanthan */}
-            <div className="card shadow-sm">
-              <div className="card-header text-white" style={{ backgroundColor: "#004d97" }}>
-                <h5 className="mb-0">Jumlah Jemaat per Pepanthan</h5>
-              </div>
-              <div className="card-body p-0">
-                <table className="table table-bordered mb-0 text-center">
-                  <thead className="table-light">
-                    <tr>
-                      <th>No</th>
-                      <th>Pepanthan</th>
-                      <th>Jumlah Jemaat</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pepanthanData.length === 0
-                      ? <tr><td colSpan="3" className="py-3">Memuat data...</td></tr>
-                      : pepanthanData.map((item, idx) => (
-                        <tr key={idx}>
-                          <td>{idx + 1}</td>
-                          <td>{item.name}</td>
-                          <td>{item.value} orang</td>
+            <div className="row">
+              {/* Jumlah Jemaat per Pepanthan */}
+              <div className="col-md-6">
+                <div className="card shadow-sm">
+                  <div className="card-header text-white" style={{ backgroundColor: "#004d97" }}>
+                    <h5 className="mb-0">Jumlah Jemaat per Pepanthan</h5>
+                  </div>
+                  <div className="card-body p-0">
+                    <table className="table table-bordered mb-0 text-center">
+                      <thead className="table-light">
+                        <tr>
+                          <th>No</th>
+                          <th>Pepanthan</th>
+                          <th>Jumlah Jemaat</th>
                         </tr>
-                      ))
-                    }
-                  </tbody>
-                </table>
+                      </thead>
+                      <tbody>
+                        {pepanthanData.length === 0
+                          ? <tr><td colSpan="3" className="py-3">Memuat data...</td></tr>
+                          : pepanthanData.map((item, idx) => {
+                              const meninggalPepanthan = meninggalData?.rincianPepanthan?.find(
+                                m => m.namaPepanthan === item.name
+                              )?.jumlah || 0;
+
+                              const hidup = item.value - meninggalPepanthan;
+
+                              return (
+                                <tr key={idx}>
+                                  <td>{idx + 1}</td>
+                                  <td>{item.name}</td>
+                                  <td>{hidup} orang</td>
+                                </tr>
+                              );
+                            })
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              {/* Jemaat Meninggal */}
+              <div className="col-md-6">
+                {renderMeninggalTable(meninggalData)}
               </div>
             </div>
 
-            {/* Tabel Rincian Dewasa & Anak per Pepanthan */}
+            {/* Rincian Dewasa & Anak per Pepanthan */}
             <div className="card shadow-sm my-4">
               <div className="card-header text-white" style={{ backgroundColor: "#004d97" }}>
                 <h5 className="mb-0">Rincian Jemaat Dewasa & Anak per Pepanthan</h5>
@@ -285,18 +400,33 @@ const HalamanStatistik = () => {
                     {pepanthanData.length === 0
                       ? <tr><td colSpan="4" className="py-3">Memuat data...</td></tr>
                       : pepanthanData.map((pepanthan, idx) => {
-                          const dewasa = pepanthan.rincian.filter(j => {
+                          const dewasaAsli = pepanthan.rincian.filter(j => {
                             if (!j.tanggalLahir) return false;
                             const umur = Math.floor((new Date() - new Date(j.tanggalLahir)) / (1000*60*60*24*365.25));
                             return umur >= 17;
                           }).length;
 
-                          const anak = pepanthan.rincian.filter(j => {
+                          const anakAsli = pepanthan.rincian.filter(j => {
                             if (!j.tanggalLahir) return false;
                             const umur = Math.floor((new Date() - new Date(j.tanggalLahir)) / (1000*60*60*24*365.25));
                             return umur < 17;
                           }).length;
 
+                          const meninggalPepanthan = meninggalData?.rincianPepanthan?.find(
+                            m => m.namaPepanthan === pepanthan.name
+                          )?.jumlah || 0;
+
+                          const totalAsli = dewasaAsli + anakAsli;
+                          let dewasa = dewasaAsli;
+                          let anak = anakAsli;
+
+                          if (totalAsli > 0 && meninggalPepanthan > 0) {
+                            const proporsiDewasa = dewasaAsli / totalAsli;
+                            const proporsiAnak = anakAsli / totalAsli;
+
+                            dewasa = Math.max(0, Math.round(dewasaAsli - meninggalPepanthan * proporsiDewasa));
+                            anak = Math.max(0, Math.round(anakAsli - meninggalPepanthan * proporsiAnak));
+                          }
 
                           return (
                             <tr key={idx}>
@@ -323,7 +453,6 @@ const HalamanStatistik = () => {
           </>
         )}
 
-
         {activeTab === "visual" && (
           <div className="mt-4">
             <h4 className="fw-bold mb-3 text-center">📊 Distribusi Jemaat</h4>
@@ -331,10 +460,10 @@ const HalamanStatistik = () => {
             <div
               style={{
                 display: "flex",
-                justifyContent: "center", // agar konten berada di tengah
+                justifyContent: "center",
                 alignItems: "flex-start",
-                gap: "80px", // jarak antar chart
-                flexWrap: "wrap", // agar responsive di layar kecil
+                gap: "80px",
+                flexWrap: "wrap",
               }}
             >
               {/* Doughnut Chart */}
@@ -378,7 +507,6 @@ const HalamanStatistik = () => {
             </div>
           </div>
         )}
-
       </div>
     </>
   );

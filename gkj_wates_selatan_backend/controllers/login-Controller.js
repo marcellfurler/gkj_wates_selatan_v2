@@ -100,3 +100,51 @@ export const registerUser = async (req, res) => {
   }
 };
 
+// GET profile admin
+
+export const getAdminProfile = async (req, res) => {
+  try {
+    // Ambil username dari token
+    const username = req.user.username;
+
+    const [rows] = await db.query(
+      "SELECT username, namaLengkapUser, password, nomorHP FROM adminsignups WHERE username = ?",
+      [username]
+    );
+
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Admin tidak ditemukan" });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Error getAdminProfile:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { username, newPassword } = req.body;
+
+  if (!username || !newPassword) return res.status(400).json({ message: "Semua kolom wajib diisi" });
+
+  try {
+    const [rows] = await db.query(
+      "SELECT * FROM adminsignups WHERE username = ?",
+      [username]
+    );
+
+    if (rows.length === 0) return res.status(404).json({ message: "Username tidak ditemukan" });
+
+    await db.query(
+      "UPDATE adminsignups SET password = ? WHERE username = ?",
+      [newPassword, username]
+    );
+
+    res.json({ message: "Password berhasil diubah" });
+  } catch (err) {
+    console.error("Error resetPassword:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

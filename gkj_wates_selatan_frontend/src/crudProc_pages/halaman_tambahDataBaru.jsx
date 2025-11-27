@@ -394,7 +394,7 @@ const HalamanTambahDataBaru = () => {
                     <option value="Pendeta">Pendeta</option>
                     <option value="Majelis">Majelis</option>
                     <option value="Koordinator Pelayanan">Koordinator Pelayanan</option>
-                    {/* <option value="Meninggal">Meninggal</option> */}
+                    <option value="Meninggal">Meninggal</option>
                   </select>
 
                   <label className="form-label">Status Sidi</label>
