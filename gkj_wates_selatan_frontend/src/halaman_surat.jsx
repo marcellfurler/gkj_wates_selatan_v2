@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { NavbarComponent } from "./components/NavbarComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faSave, faArrowRight, faImage } from "@fortawesome/free-solid-svg-icons";
+import Footer from "./components/footer";
+
 
 /* === Komponen Daftar Surat Jemaat === */
 const DaftarSuratJemaat = () => {
@@ -337,8 +339,9 @@ const HalamanSurat = () => {
 
         </div>
       </div>
-
+      <Footer/>
     </div>
+    
   );
 };
 

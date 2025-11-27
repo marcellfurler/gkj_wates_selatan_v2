@@ -6,6 +6,8 @@ import { NavbarComponent } from "./components/NavbarComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import Footer from "./components/footer";
+
 
 // Import marker warna berbeda
 import blueMarker from "leaflet-color-markers/img/marker-icon-blue.png";
@@ -107,6 +109,7 @@ const HalamanPeta = () => {
           </MapContainer>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

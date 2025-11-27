@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { NavbarComponent } from "./components/NavbarComponent";
+import Footer from "./components/footer";
+
 
 const AdminProfile = () => {
   const [adminInfo, setAdminInfo] = useState(null);
@@ -11,7 +13,7 @@ const AdminProfile = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -155,6 +157,7 @@ const AdminProfile = () => {
           )}
         </div>
       </div>
+        <Footer/>
     </>
   );
 };

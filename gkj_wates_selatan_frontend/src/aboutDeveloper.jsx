@@ -6,6 +6,8 @@ import backgroundimg2 from "./assets/gkjwatesselatan2.png";
 import fotoProfil from "./assets/jimm.jpeg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import Footer from "./components/footer";
+
 
 const HalamanDeveloper = () => {
   const navigate = useNavigate();
@@ -45,7 +47,7 @@ const HalamanDeveloper = () => {
                 objectFit: "cover",
                 }}
             />
-            <h3 className="fw-bold">Developer Aplikasi</h3>
+            <h4 className="fw-bold">Developer Website</h4>
             </div>
 
 
@@ -125,14 +127,10 @@ const HalamanDeveloper = () => {
               <FontAwesomeIcon icon={faArrowLeft} /> Kembali
             </button>
 
-            <div className="text-center mt-4">
-              <p className="text-muted small">
-                © {new Date().getFullYear()} – Dibuat oleh Jimm - Universitas Kristen Duta Wacana - Fakultas Teknologi Informasi - Program Studi Informatika
-              </p>
-            </div>
           </div>
         </div>
       </div>
+        <Footer/>
     </>
   );
 };

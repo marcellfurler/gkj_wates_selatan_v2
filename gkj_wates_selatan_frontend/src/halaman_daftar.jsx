@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import logoGKJ from './assets/logoGKJ.png';
 import backgroundimg2 from './assets/gkjwatesselatan2.png';
 import { NavbarComponentLogin } from './components/NavbarComponent';
+import Footer from "./components/footer";
+
 
 // =======================
 // Komponen Form Daftar
@@ -209,6 +211,7 @@ const HalamanDaftar = () => {
                     </div>
                 </div>
             </div>
+            <Footer/>
         </>
     );
 };

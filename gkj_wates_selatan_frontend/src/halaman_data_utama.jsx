@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { NavbarComponent } from './components/NavbarComponent';
   // import jwt from "jsonwebtoken";
   import { useNavigate } from "react-router-dom";
+  import Footer from "./components/footer";
 
 
 const TabelDataJemaat = () => {
@@ -534,8 +535,9 @@ const TabelDataJemaat = () => {
 
         </ul>
       </nav>
-
+      
     </div>
+    
   );
 };
 
@@ -555,6 +557,7 @@ const HalamanData = () => {
     <div style={{ minHeight: '100vh', backgroundColor: 'white' }}>
       <NavbarComponent />
       <TabelDataJemaat />
+      <Footer />
     </div>
   );
 };

@@ -4,6 +4,8 @@ import { faPencilAlt, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { NavbarComponent } from '../components/NavbarComponent';
 import axios from 'axios';
 import { useEffect, useState } from "react";
+import Footer from "../components/footer";
+
 
 // Import default assets
 import maleIcon from '../assets/laki.png';
@@ -273,6 +275,7 @@ const DetailJemaat = ({ data }) => {
         </div>
       </div>
     </div>
+    
   );
 };
 
@@ -310,6 +313,7 @@ const HalamanDetail = () => {
     <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
       <NavbarComponent />
       <DetailJemaat data={data} />
+      <Footer/>
     </div>
   );
 };

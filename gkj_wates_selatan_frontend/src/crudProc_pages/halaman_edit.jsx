@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faSave } from "@fortawesome/free-solid-svg-icons";
 import { NavbarComponent } from "../components/NavbarComponent";
+import Footer from "../components/footer";
+
 
 const EditJemaat = () => {
   const navigate = useNavigate();
@@ -430,6 +432,7 @@ const EditJemaat = () => {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

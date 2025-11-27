@@ -5,6 +5,8 @@ import BarChart from "./components/charts/barChart";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import Footer from "./components/footer";
+
 
 const HalamanStatistik = () => {
   const navigate = useNavigate();
@@ -508,6 +510,7 @@ const HalamanStatistik = () => {
           </div>
         )}
       </div>
+      <Footer/>
     </>
   );
 };
