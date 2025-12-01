@@ -160,10 +160,24 @@ export const NavbarComponent = () => {
                     </li>
 
                     <li>
+                      <Link className="dropdown-item " to="#">
+                        Pusat Unduhan
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link className="dropdown-item " to="#">
+                        Website Utama GKJ Wates Selatan
+                      </Link>
+                    </li>
+
+                    <li>
                       <Link className="dropdown-item text-success" to="/developer">
                         Developer
                       </Link>
                     </li>
+
+                    
 
                     <li>
                       <button className="dropdown-item text-danger" onClick={handleLogout}>

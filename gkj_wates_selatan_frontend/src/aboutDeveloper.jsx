@@ -101,8 +101,8 @@ const HalamanDeveloper = () => {
               <textarea
                 className="form-control"
                 style={{ resize: "none" }}
-                rows="3"
-                value="JavaScript, React, Bootsrap, Laragon, PHPmyAdmin, ASUS A516JAO 2022, MySQL, css, HTML, GIT-Hub, Figma, YouTube, Chat GPT, Gemini, Google Workspace, FlatIcon"
+                rows="4"
+                value="JavaScript, React, Bootsrap, Laragon, PHPmyAdmin, ASUS A516JAO 2022, MySQL, Microsoft Workspace css, HTML, GIT-Hub, Figma, YouTube, Chat GPT, Gemini, Google Workspace, FlatIcon"
                 disabled
               />
             </div>
@@ -113,8 +113,7 @@ const HalamanDeveloper = () => {
                 className="form-control"
                 style={{ resize: "none" }}
                 rows="5"
-                value="Tuhan Yesus sang Guru Agung, Orang tua saya,Universitas Kristen Duta Wacana,
-                Pendeta dan Warga Jemaat GKJ Wates Selatan, FTI UKDW, Pusat Pelatiihan Bahasa UKDW, Pak Gani, Carol, Thanel, Sia, teman-teman lain yang mendukung perkembangan proyek ini"
+                value="Tuhan Yesus sang Guru Agung, Orang tua saya, Universitas Kristen Duta Wacana, Pendeta dan Warga Jemaat GKJ Wates Selatan, FTI UKDW, Pusat Pelatihan Bahasa UKDW, Pak Gani, Carol, Thanel, Sia, teman-teman lain yang mendukung perkembangan proyek ini"
                 disabled
               />
             </div>

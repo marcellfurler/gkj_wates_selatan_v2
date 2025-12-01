@@ -263,16 +263,7 @@ const HalamanSurat = () => {
                   Daftar Surat Jemaat
                 </button>
 
-                <button
-                  className="nav-link"
-                  id="nav-lain-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#nav-lain"
-                  role="tab"
-                  style={{ color: "#004d97" }}
-                >
-                  Lainnya
-                </button>
+
               </div>
             </nav>
 
