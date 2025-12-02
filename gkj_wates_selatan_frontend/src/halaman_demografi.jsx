@@ -49,9 +49,9 @@ const gerejaData = [
   },
   { 
     nama: "GKJ Wates Selatan Triharjo",  
-    lat: -7.886425691696392, 
-    lng: 110.13346921691945,
-    alamat: "Triharjo, Kec. Wates, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta",
+    lat: -7.883960928821258, 
+    lng: 110.14036307263392,
+    alamat: "Dusun Ngrandu, Desa Triharjo, Kec. Wates, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta",
     warna: "orange"
   },
 ];
