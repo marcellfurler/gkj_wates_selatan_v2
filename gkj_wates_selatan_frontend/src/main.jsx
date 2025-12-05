@@ -13,6 +13,7 @@ import HalamanStatistik from './halaman_statistik'
 import HalamanDemografi from './halaman_demografi'
 import InformasiAdmin from './halaman_informasiAdmin'
 import AboutDeveloper from './aboutDeveloper.jsx'
+import PusatUnduhan from './halaman_pusatUnduhan'
 
 
 import HalamanSurat from './halaman_surat'
@@ -65,6 +66,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/demografi" element={<HalamanDemografi />} />
         <Route path="/informasiAdmin" element={<InformasiAdmin />} />
         <Route path="/developer" element={<AboutDeveloper />} />
+        <Route path="/pusatUnduhan" element={<PusatUnduhan />} />
         
 
         {/* Bagian Surat */}

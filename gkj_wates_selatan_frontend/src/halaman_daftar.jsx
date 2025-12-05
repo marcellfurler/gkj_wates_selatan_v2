@@ -99,7 +99,7 @@ const RegisterForm = () => {
 
             {/* Email */}
             <div className="mb-2 text-start">
-                <label className="form-label">Nomor HP / Email</label>
+                <label className="form-label">Nomor HP</label>
                 <input
                     type="text"
                     id="nomorHP"

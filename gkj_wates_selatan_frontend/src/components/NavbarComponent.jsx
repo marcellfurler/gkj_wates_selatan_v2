@@ -160,7 +160,7 @@ export const NavbarComponent = () => {
                     </li>
 
                     <li>
-                      <Link className="dropdown-item " to="#">
+                      <Link className="dropdown-item " to="/pusatUnduhan">
                         Pusat Unduhan
                       </Link>
                     </li>
