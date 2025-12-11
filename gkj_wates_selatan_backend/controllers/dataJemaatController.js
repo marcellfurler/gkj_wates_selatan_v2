@@ -116,6 +116,18 @@ export const updateJemaat = async (req, res) => {
   const { kodeJemaat } = req.params;
   const promisePool = db;
 
+  function safeDate(v) {
+    if (!v) return null;
+
+    // Jika hasil parse dari multer/express berupa ISO lengkap (ada "T")
+    if (typeof v === "string" && v.includes("T")) {
+      return v.split("T")[0]; // ambil YYYY-MM-DD
+    }
+
+    return v; // jika sudah YYYY-MM-DD
+  }
+
+
   try {
     // Ambil data lama
     const [rows] = await promisePool.query(
@@ -135,10 +147,13 @@ export const updateJemaat = async (req, res) => {
     } = req.body;
 
     // Format tanggal
-    tanggalLahir = formatDate(tanggalLahir);
-    tanggalBaptis = formatDate(tanggalBaptis);
-    tanggalSidi = formatDate(tanggalSidi);
-    tanggalNikah = formatDate(tanggalNikah);
+    // === FIX FORMAT TANGGAL ===
+    tanggalLahir = safeDate(tanggalLahir) || old.tanggalLahir;
+    tanggalBaptis = safeDate(tanggalBaptis);
+    tanggalSidi = safeDate(tanggalSidi);
+    tanggalNikah = safeDate(tanggalNikah);
+
+
 
     nomorTelepon = nomorTelepon?.trim() || old.nomorTelepon;
 

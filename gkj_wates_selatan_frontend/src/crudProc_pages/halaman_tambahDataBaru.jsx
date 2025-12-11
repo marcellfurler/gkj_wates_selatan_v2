@@ -392,7 +392,7 @@ const HalamanTambahDataBaru = () => {
                   >
                     <option value="">-- Pilih --</option>
                     <option value="Jemaat">Jemaat</option>
-                    <option value="Pendeta">Pendeta</option>
+                    {/* <option value="Pendeta">Pendeta</option> */}
                     <option value="Majelis">Majelis</option>
                     <option value="Koordinator Pelayanan">Koordinator Pelayanan</option>
                     <option value="Meninggal">Meninggal</option>
