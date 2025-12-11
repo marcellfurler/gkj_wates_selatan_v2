@@ -73,9 +73,9 @@ const HalamanTambahDataBaru = () => {
 
   const handleNext = (e) => {
     e.preventDefault();
-    if (formData.namaPelayanan === "Pendeta") setStep(2);
-    else setStep(3);
+    setStep(3); // semua langsung ke step 3
   };
+
 
   const handleNextAfterPelayanan = (e) => {
     e.preventDefault();
@@ -84,8 +84,9 @@ const HalamanTambahDataBaru = () => {
 
   const handleBack = () => {
     if (step === 2) setStep(1);
-    else if (step === 3) setStep(formData.namaPelayanan === "Pendeta" ? 2 : 1);
+    else if (step === 3) setStep(1); // kembalikan langsung ke step 1
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
