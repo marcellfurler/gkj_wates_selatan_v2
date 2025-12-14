@@ -371,8 +371,9 @@ const TabelDataJemaat = () => {
               >
                 <option value="">-- Pilih Urutan --</option>
                 <option value="Jemaat">Jemaat</option>
-                <option value="Pelayanan1">Pelayanan1</option>
-                <option value="Pelayanan2">Pelayanan2</option>
+                <option value="Meninggal">Meninggal</option>
+                <option value="Pendeta">Pendeta</option>
+                <option value="Majelis">Majelis</option>
               </select>
             </div>
 
