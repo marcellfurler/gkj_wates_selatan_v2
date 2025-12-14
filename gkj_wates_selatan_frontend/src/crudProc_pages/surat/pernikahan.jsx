@@ -430,8 +430,12 @@ const Pernikahan = () => {
               </div>
 
               {/* === Tombol Aksi === */}
-              <div className="d-flex justify-content-end mt-4">
-                <button type="submit" className="btn btn-primary">
+              <div className="text-end mt-4">
+                <button
+                  type="submit"
+                  className="btn btn-primary px-4"
+                  style={{ backgroundColor: "#004d97" }}
+                >
                   Kirim Permohonan
                 </button>
               </div>

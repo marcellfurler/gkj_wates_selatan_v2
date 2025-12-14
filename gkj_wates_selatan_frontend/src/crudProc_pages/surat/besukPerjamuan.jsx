@@ -323,10 +323,14 @@ const BesukPerjamuan = () => {
               />
 
               <div className="text-end mt-4">
-                <button type="submit" className="btn btn-primary px-4" style={{ backgroundColor: "#004d97" }}>
+                <button
+                  type="submit"
+                  className="btn btn-primary px-4"
+                  style={{ backgroundColor: "#004d97" }}
+                >
                   Kirim Permohonan
                 </button>
-              </div>
+                </div>
             </form>
           </div>
         </div>

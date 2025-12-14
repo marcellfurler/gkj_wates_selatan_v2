@@ -249,11 +249,15 @@ const PemberitahuanKelahiran = () => {
                 </div>
               </div>
 
-              <div className="d-flex justify-content-end mt-4">
-                <button type="submit" className="btn btn-primary">
-                  Kirim Pemberitahuan
+              <div className="text-end mt-4">
+                <button
+                  type="submit"
+                  className="btn btn-primary px-4"
+                  style={{ backgroundColor: "#004d97" }}
+                >
+                  Kirim Permohonan
                 </button>
-              </div>
+                </div>
             </form>
           </div>
         </div>
