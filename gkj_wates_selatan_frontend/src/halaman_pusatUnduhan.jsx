@@ -4,8 +4,9 @@ import Footer from "./components/footer";
 
 export default function PusatUnduhan() {
   const files = [
-    { id: 1, name: "Buku Panduan", file: "contohUnduhan.pdf" },
-    // { id: 2, name: "File Kedua", file: "file2.pdf" },
+    { id: 1, name: "Buku Panduan", file: "BukuPanduanMagang.pdf" },
+    { id: 2, name: "Sejarah GKJ Wates Selatan", file: "BukuSejarah.pdf" },
+    { id: 3, name: "Struktur Organisasi GKJ Wates Selatan 2025", file: "StrukturOrganisasi.pdf" },
   ];
 
   return (
