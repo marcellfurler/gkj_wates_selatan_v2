@@ -127,13 +127,13 @@ const DetailJemaat = ({ data }) => {
       label: 'Baptis',
       value: data.statusBaptis && data.statusBaptis !== '-' 
         ? [data.statusBaptis, `${data.tempatBaptis || '-'}, ${formatTanggal(data.tanggalBaptis)}`]
-        : ['Belum Baptis', ''],
+        : ['Belum Diketahui', ''],
     },
     {
       label: 'Sidi',
       value: data.statusSidi && data.statusSidi !== '-' 
         ? [data.statusSidi, `${data.tempatSidi || '-'}, ${formatTanggal(data.tanggalSidi)}`]
-        : ['Belum Sidi', ''],
+        : ['Belum Diketahui', ''],
     },
     {
       label: 'Nikah',
@@ -143,7 +143,7 @@ const DetailJemaat = ({ data }) => {
             `${data.tempatNikah || '-'}, ${formatTanggal(data.tanggalNikah)}`,
             data.namaPasangan ? `Nama Pasangan: ${data.namaPasangan} (${data.gerejaAsal || '-'})` : ''
           ]
-        : ['Belum Nikah', ''],
+        : ['Belum Diketahui', ''],
     },
     {
       label: "Pelayanan",
