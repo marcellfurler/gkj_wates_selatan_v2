@@ -467,9 +467,9 @@ const TabelDataJemaat = () => {
                       </td>
                       <td className="text-center">{data.jenisKelamin || '-'}</td>
                       <td className="text-center">{data.namaPepanthan || '-'}</td>
-                      <td className="text-center">{data.statusSidi === 'Sidi' ? 'Sidi' : 'Belum Diketahui'}</td>
-                      <td className="text-center">{data.statusBaptis === 'Baptis' ? 'Baptis' : 'Belum Diketahui'}</td>
-                      <td className="text-center">{data.statusNikah === 'Nikah' ? 'Nikah' : 'Belum Diketahui'}</td>
+                      <td className="text-center">{data.statusBaptis || 'Belum Diketahui'}</td>
+                      <td className="text-center">{data.statusSidi || 'Belum Diketahui'}</td>
+                      <td className="text-center">{data.statusNikah || 'Belum Diketahui'}</td>
                       <td className="text-center">{data.namaPelayanan ?? 'Belum Diketahui'}</td>
 
                       <td className="text-center">
