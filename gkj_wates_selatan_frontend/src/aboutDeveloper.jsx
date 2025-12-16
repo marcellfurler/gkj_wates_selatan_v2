@@ -102,7 +102,7 @@ const HalamanDeveloper = () => {
                 className="form-control"
                 style={{ resize: "none" }}
                 rows="4"
-                value="JavaScript, React, Bootsrap, Laragon, PHPmyAdmin, ASUS A516JAO 2022, MySQL, Microsoft Workspace css, HTML, GIT-Hub, Figma, YouTube, Chat GPT, Gemini, Google Workspace, FlatIcon"
+                value="JavaScript, React, Bootsrap, Laragon, PHPmyAdmin, ASUS A516JAO 2022, MySQL, Microsoft Workspace css, HTML, GIT-Hub, TableConvert, Figma, YouTube, Chat GPT, Gemini, Google Workspace, FlatIcon"
                 disabled
               />
             </div>

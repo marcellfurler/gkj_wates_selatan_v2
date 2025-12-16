@@ -167,6 +167,18 @@ const TabelDataJemaat = () => {
   const currentData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  // ===== PAGINATION SLIDING =====
+const maxVisiblePages = 5;
+const half = Math.floor(maxVisiblePages / 2);
+
+let startPage = Math.max(currentPage - half, 1);
+let endPage = startPage + maxVisiblePages - 1;
+
+if (endPage > totalPages) {
+  endPage = totalPages;
+  startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+}
+
 
   return (
     <div className="container-fluid mt-4 mb-3 px-5">
@@ -186,10 +198,15 @@ const TabelDataJemaat = () => {
           <button
             type="button"
             className="btn btn-outline-secondary"
-            onClick={() => setSearch(searchInput)} // tekan tombol Cari, hanya set searchInput sementara
+            onClick={() => {
+              setSearch(searchInput);
+              setAppliedFilters(filters); // kalau pakai filter
+              setCurrentPage(1);          // reset ke halaman 1
+            }}
           >
             Cari
           </button>
+
           <button
             type="button"
             className="btn btn-outline-secondary"
@@ -445,8 +462,8 @@ const TabelDataJemaat = () => {
                   <th>Tempat, Tanggal Lahir</th>
                   <th>Jenis Kelamin</th>
                   <th>Pepanthan</th>
-                  <th>Status Sidi</th>
                   <th>Status Baptis</th>
+                  <th>Status Sidi</th>
                   <th>Status Pernikahan</th>
                   <th>Status Pelayanan</th>
                   <th>Inf. Lengkap</th>
@@ -510,19 +527,24 @@ const TabelDataJemaat = () => {
           </li>
 
           {/* Numbered pages */}
-          {[...Array(totalPages)].map((_, i) => (
+          {/* Numbered pages (Sliding) */}
+          {Array.from(
+            { length: endPage - startPage + 1 },
+            (_, i) => startPage + i
+          ).map((page) => (
             <li
-              key={i}
-              className={`page-item ${currentPage === i + 1 ? "active" : ""}`}
+              key={page}
+              className={`page-item ${currentPage === page ? "active" : ""}`}
             >
               <button
                 className="page-link"
-                onClick={() => setCurrentPage(i + 1)}
+                onClick={() => setCurrentPage(page)}
               >
-                {i + 1}
+                {page}
               </button>
             </li>
           ))}
+
 
           {/* Next */}
           <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
