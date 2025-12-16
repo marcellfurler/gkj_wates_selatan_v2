@@ -236,59 +236,140 @@ export const updateJemaat = async (req, res) => {
     // =========================
 
     // Baptis
+    // Baptis
     if (statusBaptis === "Baptis") {
-      const [bap] = await promisePool.query(`SELECT * FROM dataBaptis WHERE kodeJemaat=?`, [kodeJemaat]);
+      const [bap] = await promisePool.query(
+        `SELECT * FROM dataBaptis WHERE kodeJemaat=?`,
+        [kodeJemaat]
+      );
+
       if (bap.length) {
         await promisePool.query(
-          `UPDATE dataBaptis SET statusBaptis=?, tanggalBaptis=?, tempatBaptis=? WHERE kodeJemaat=?`,
-          [statusBaptis, tanggalBaptis || null, tempatBaptis || null, kodeJemaat]
+          `UPDATE dataBaptis 
+          SET statusBaptis=?, tanggalBaptis=?, tempatBaptis=? 
+          WHERE kodeJemaat=?`,
+          [
+            statusBaptis,
+            tanggalBaptis || null,
+            tempatBaptis || null,
+            kodeJemaat
+          ]
         );
       } else {
         await promisePool.query(
-          `INSERT INTO dataBaptis (kodeJemaat, statusBaptis, tanggalBaptis, tempatBaptis) VALUES (?, ?, ?, ?)`,
-          [kodeJemaat, statusBaptis, tanggalBaptis || null, tempatBaptis || null]
+          `INSERT INTO dataBaptis 
+          (kodeJemaat, statusBaptis, tanggalBaptis, tempatBaptis) 
+          VALUES (?, ?, ?, ?)`,
+          [
+            kodeJemaat,
+            statusBaptis,
+            tanggalBaptis || null,
+            tempatBaptis || null
+          ]
         );
       }
     } else {
-      // Kalau diubah ke Belum Baptis → hapus record
-      await promisePool.query(`DELETE FROM dataBaptis WHERE kodeJemaat=?`, [kodeJemaat]);
+      // Jika berubah menjadi Belum Baptis
+      await promisePool.query(
+        `UPDATE dataBaptis 
+        SET statusBaptis=?, tanggalBaptis=NULL, tempatBaptis=NULL 
+        WHERE kodeJemaat=?`,
+        ["Belum Baptis", kodeJemaat]
+      );
     }
+
 
     // Sidi
+    // Sidi
     if (statusSidi === "Sidi") {
-      const [sidi] = await promisePool.query(`SELECT * FROM dataSidi WHERE kodeJemaat=?`, [kodeJemaat]);
+      const [sidi] = await promisePool.query(
+        `SELECT * FROM dataSidi WHERE kodeJemaat=?`,
+        [kodeJemaat]
+      );
+
       if (sidi.length) {
         await promisePool.query(
-          `UPDATE dataSidi SET statusSidi=?, tanggalSidi=?, tempatSidi=? WHERE kodeJemaat=?`,
-          [statusSidi, tanggalSidi || null, tempatSidi || null, kodeJemaat]
+          `UPDATE dataSidi 
+          SET statusSidi=?, tanggalSidi=?, tempatSidi=? 
+          WHERE kodeJemaat=?`,
+          [
+            statusSidi,
+            tanggalSidi || null,
+            tempatSidi || null,
+            kodeJemaat
+          ]
         );
       } else {
         await promisePool.query(
-          `INSERT INTO dataSidi (kodeJemaat, statusSidi, tanggalSidi, tempatSidi) VALUES (?, ?, ?, ?)`,
-          [kodeJemaat, statusSidi, tanggalSidi || null, tempatSidi || null]
+          `INSERT INTO dataSidi 
+          (kodeJemaat, statusSidi, tanggalSidi, tempatSidi) 
+          VALUES (?, ?, ?, ?)`,
+          [
+            kodeJemaat,
+            statusSidi,
+            tanggalSidi || null,
+            tempatSidi || null
+          ]
         );
       }
     } else {
-      await promisePool.query(`DELETE FROM dataSidi WHERE kodeJemaat=?`, [kodeJemaat]);
+      // Jika berubah menjadi Belum Sidi
+      await promisePool.query(
+        `UPDATE dataSidi 
+        SET statusSidi=?, tanggalSidi=NULL, tempatSidi=NULL 
+        WHERE kodeJemaat=?`,
+        ["Belum Sidi", kodeJemaat]
+      );
     }
 
+
+    // Nikah
     // Nikah
     if (statusNikah === "Nikah") {
-      const [nikah] = await promisePool.query(`SELECT * FROM dataNikah WHERE kodeJemaat=?`, [kodeJemaat]);
+      const [nikah] = await promisePool.query(
+        `SELECT * FROM dataNikah WHERE kodeJemaat=?`,
+        [kodeJemaat]
+      );
+
       if (nikah.length) {
         await promisePool.query(
-          `UPDATE dataNikah SET statusNikah=?, tanggalNikah=?, tempatNikah=?, namaPasangan=?, gerejaAsal=? WHERE kodeJemaat=?`,
-          [statusNikah, tanggalNikah || null, tempatNikah || null, namaPasangan || null, gerejaAsal || null, kodeJemaat]
+          `UPDATE dataNikah 
+          SET statusNikah=?, tanggalNikah=?, tempatNikah=?, namaPasangan=?, gerejaAsal=? 
+          WHERE kodeJemaat=?`,
+          [
+            statusNikah,
+            tanggalNikah || null,
+            tempatNikah || null,
+            namaPasangan || null,
+            gerejaAsal || null,
+            kodeJemaat
+          ]
         );
       } else {
         await promisePool.query(
-          `INSERT INTO dataNikah (kodeJemaat, statusNikah, tanggalNikah, tempatNikah, namaPasangan, gerejaAsal) VALUES (?, ?, ?, ?, ?, ?)`,
-          [kodeJemaat, statusNikah, tanggalNikah || null, tempatNikah || null, namaPasangan || null, gerejaAsal || null]
+          `INSERT INTO dataNikah 
+          (kodeJemaat, statusNikah, tanggalNikah, tempatNikah, namaPasangan, gerejaAsal) 
+          VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            kodeJemaat,
+            statusNikah,
+            tanggalNikah || null,
+            tempatNikah || null,
+            namaPasangan || null,
+            gerejaAsal || null
+          ]
         );
       }
     } else {
-      await promisePool.query(`DELETE FROM dataNikah WHERE kodeJemaat=?`, [kodeJemaat]);
+      // Jika berubah menjadi belum nikah
+      await promisePool.query(
+        `UPDATE dataNikah 
+        SET statusNikah=?, tanggalNikah=NULL, tempatNikah=NULL, namaPasangan=NULL, gerejaAsal=NULL 
+        WHERE kodeJemaat=?`,
+        ["Belum Nikah", kodeJemaat]
+      );
     }
+
 
 
 
