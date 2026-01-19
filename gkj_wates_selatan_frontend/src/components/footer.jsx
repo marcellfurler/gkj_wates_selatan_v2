@@ -28,7 +28,8 @@ const Footer = () => {
       }}
     >
       <p className="text-muted small m-0">
-        <strong>Nama Website:</strong> Sistem Informasi GKJ Wates Selatan <br />
+        <strong>Nama Website: </strong> 
+        <a href="https://crl.labjaringanukdw.my.id/" target="_blank">Sistem Informasi GKJ Wates Selatan</a> <br />
         <strong>Tanggal:</strong>{" "}
         {time.toLocaleDateString("id-ID", {
           weekday: "long",

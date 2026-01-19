@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavbarComponent } from "../../components/NavbarComponent";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 const PencalonanMajelis = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -38,7 +40,7 @@ const PencalonanMajelis = () => {
     // 2. Kirim Data ke Backend (Endpoint: POST /api/surat)
     try {
         console.log("📤 Mengirim data permohonan ke backend...");
-        const response = await fetch('http://localhost:5000/api/surat', {
+        const response = await fetch(`${API_BASE}/api/surat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payloadToBackend)

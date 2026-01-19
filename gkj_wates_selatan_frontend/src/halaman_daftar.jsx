@@ -5,7 +5,7 @@ import logoGKJ from './assets/logoGKJ.png';
 import backgroundimg2 from './assets/gkjwatesselatan2.png';
 import { NavbarComponentLogin } from './components/NavbarComponent';
 import Footer from "./components/footer";
-
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 // =======================
 // Komponen Form Daftar
@@ -33,7 +33,7 @@ const RegisterForm = () => {
     // Fungsi untuk submit data ke backend
     const handleSubmit = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/register", {
+            const response = await fetch(`${API_BASE}/api/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)

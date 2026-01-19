@@ -57,7 +57,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<HalamanUtama />} />
         <Route path="/login" element={<HalamanLogin />} />
-        <Route path="/daftar" element={<HalamanDaftar />} />
+        {/* <Route path="/daftar" element={<HalamanDaftar />} /> */}
         <Route path="/data" element={<HalamanData />} />
         <Route path="/detail" element={<HalamanDetail />} />
         <Route path="/edit" element={<HalamanEdit />} />

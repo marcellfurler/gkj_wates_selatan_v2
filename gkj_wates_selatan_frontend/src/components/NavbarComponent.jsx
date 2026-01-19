@@ -51,7 +51,7 @@ export const NavbarComponent = () => {
           {/* Logo */}
           <Link
             className="navbar-brand d-flex align-items-center"
-            to="/"
+            to="#"
             style={{ fontSize: "1.1rem", fontWeight: "600", color: "#004d99" }}
           >
             <img
@@ -166,7 +166,7 @@ export const NavbarComponent = () => {
                     </li>
 
                     <li>
-                      <Link className="dropdown-item " to="#">
+                      <Link className="dropdown-item " to="https://crl.labjaringanukdw.my.id/">
                         Website Utama GKJ Wates Selatan
                       </Link>
                     </li>

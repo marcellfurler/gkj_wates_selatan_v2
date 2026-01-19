@@ -5,6 +5,8 @@ import { NavbarComponent } from './components/NavbarComponent';
   import { useNavigate } from "react-router-dom";
   import Footer from "./components/footer";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
 const TabelDataJemaat = () => {
   const navigate = useNavigate();  
@@ -41,9 +43,13 @@ const TabelDataJemaat = () => {
     return;
   }
 
-  fetch("http://localhost:5000/api/jemaat", {
-    headers: { "Authorization": `Bearer ${token}` }
-  })
+  fetch(`${API_BASE}/api/jemaat`, {
+  headers: {
+    "Authorization": `Bearer ${token}`
+  }
+})
+
+
   .then(async res => {
     if (!res.ok) {
       if (res.status === 401) {

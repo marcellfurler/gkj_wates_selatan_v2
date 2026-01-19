@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+dotenv.config(); // HARUS sebelum import db.js
+
+
 import express from "express";
 import cors from "cors";
 import path from "path";
@@ -16,7 +20,32 @@ const app = express();
 // ================================
 // Middleware utama
 // ================================
-app.use(cors());
+// app.use(cors({
+//   origin: "http://192.168.100.72:3000",
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//  credentials: true
+//}));
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    const allowedOrigins = [
+      "http://192.168.100.72:3000",
+      "https://jimm.labjaringanukdw.my.id"
+    ];
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, false); // ❗ JANGAN throw error
+    }
+  },
+  credentials: true
+}));
+
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -51,6 +80,6 @@ app.get("/", (req, res) => {
 // Jalankan server
 // ================================
 const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`✅ Server berjalan di: http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`✅ Server berjalan di port ${PORT}`);
 });

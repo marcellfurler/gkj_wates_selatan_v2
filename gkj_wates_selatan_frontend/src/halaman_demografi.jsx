@@ -8,6 +8,8 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import Footer from "./components/footer";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
 // Import marker warna berbeda
 import blueMarker from "leaflet-color-markers/img/marker-icon-blue.png";

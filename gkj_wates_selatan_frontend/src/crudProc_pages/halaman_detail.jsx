@@ -6,6 +6,8 @@ import axios from 'axios';
 import { useEffect, useState } from "react";
 import Footer from "../components/footer";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
 // Import default assets
 import maleIcon from '../assets/laki.png';
@@ -170,7 +172,7 @@ const DetailJemaat = ({ data }) => {
     if (!window.confirm("Apakah Anda yakin ingin menghapus jemaat ini?")) return;
 
     try {
-      const response = await axios.delete(`http://localhost:5000/api/jemaat/hapus/${kodeJemaat}`);
+      const response = await axios.delete(`${API_BASE}/api/jemaat/hapus/${kodeJemaat}`);
       alert(response.data.message);
       navigate("/data");
     } catch (error) {
@@ -183,7 +185,7 @@ const DetailJemaat = ({ data }) => {
   // Pilih foto default berdasarkan jenis kelamin
   // -----------------------------
   const fotoSrc = data.foto
-    ? `http://localhost:5000/${data.foto}`
+    ? `${API_BASE}/${data.foto}`
     : data.jenisKelamin === "Perempuan"
       ? femaleIcon
       : maleIcon;
@@ -292,7 +294,7 @@ const HalamanDetail = () => {
       if (initialData?.namaPelayanan === "Pendeta" && initialData?.kodePendeta) {
         try {
           const { data: pendetaData } = await axios.get(
-            `http://localhost:5000/api/pendeta/${initialData.kodePendeta}`
+            `${API_BASE}/api/pendeta/${initialData.kodePendeta}`
           );
           setData(prevData => ({
             ...prevData,

@@ -4,6 +4,8 @@ import { NavbarComponent } from "../../../components/NavbarComponent";
 import html2pdf from "html2pdf.js";
 import { printSurat } from "../../../components/printSurat";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 const SuratTemplateBaptisDewasa = () => { // 💡 Pastikan nama komponen konsisten
     // 💡 SEMUA HOOK HARUS DI SINI (TOP LEVEL)
     const navigate = useNavigate();
@@ -24,7 +26,7 @@ const SuratTemplateBaptisDewasa = () => { // 💡 Pastikan nama komponen konsist
         if (idSuratDariDaftar) {
             console.log("Mendeteksi ID Print dari localStorage:", idSuratDariDaftar);
             
-            fetch(`http://localhost:5000/api/surat/${idSuratDariDaftar}`) 
+            fetch(`${API_BASE}/api/surat/${idSuratDariDaftar}`) 
                 .then((res) => {
                     if (!res.ok) throw new Error("Gagal mengambil data surat dari DB");
                     return res.json();

@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faSave, faArrowRight, faImage } from "@fortawesome/free-solid-svg-icons";
 import Footer from "./components/footer";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
 /* === Komponen Daftar Surat Jemaat === */
 const DaftarSuratJemaat = () => {
@@ -53,7 +55,7 @@ const DaftarSuratJemaat = () => {
 
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/surat")
+    fetch(`${API_BASE}/api/surat`)
       .then((res) => res.json())
       .then((data) => {
         setDaftarSurat(data);
@@ -65,7 +67,7 @@ const DaftarSuratJemaat = () => {
     if (!window.confirm("Yakin ingin menghapus surat ini?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/surat/${kodeDataSurat}`, {
+      const res = await fetch(`${API_BASE}/api/surat/${kodeDataSurat}`, {
         method: "DELETE",
       });
 

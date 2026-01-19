@@ -5,6 +5,8 @@ import { faArrowLeft, faSave, faArrowRight, faImage } from "@fortawesome/free-so
 import { NavbarComponent } from "../components/NavbarComponent";
 import Footer from "../components/footer";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 const HalamanTambahDataBaru = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -93,8 +95,8 @@ const HalamanTambahDataBaru = () => {
 
     const apiEndpoint =
       formData.namaPelayanan === "Pendeta"
-        ? "http://localhost:5000/api/pendeta"
-        : "http://localhost:5000/api/jemaat";
+        ? `${API_BASE}/api/pendeta`
+        : `${API_BASE}/api/jemaat`;
 
     try {
       const form = new FormData();

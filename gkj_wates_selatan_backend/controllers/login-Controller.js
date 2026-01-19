@@ -4,48 +4,49 @@ import jwt from "jsonwebtoken";
 const SECRET = "RAHASIA_SUPER_SECRET";
 
 export const login = async (req, res) => {
-    const { username, password } = req.body;
+  const { username, password } = req.body;
 
-    if (!username || !password) {
-        return res.status(400).json({ message: "Username dan password wajib diisi" });
+  if (!username || !password) {
+    return res.status(400).json({ message: "Username dan password wajib diisi" });
+  }
+
+  try {
+    const [rows] = await db.query(
+      "SELECT * FROM adminsignups WHERE username = ?",
+      [username]
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({ message: "Username tidak ditemukan" });
     }
 
-    try {
-        const [rows] = await db.query(
-            "SELECT * FROM adminsignups WHERE username = ?",
-            [username]
-        );
+    const user = rows[0];
 
-        if (rows.length === 0) {
-            return res.status(401).json({ message: "Username tidak ditemukan" });
-        }
-
-        const user = rows[0];
-
-        if (user.password !== password) {
-            return res.status(401).json({ message: "Password salah" });
-        }
-
-        // Buat token JWT
-        const token = jwt.sign(
-            { id: user.id, username: user.username },
-            SECRET,
-            { expiresIn: "1d" }
-        );
-
-        // Kirim response
-        res.json({
-            message: "Login berhasil",
-            token,
-            username: user.username,
-            namaLengkapUser: user.namaLengkapUser // harus sesuai kolom di DB
-        });
-
-    } catch (error) {
-        console.error("❌ Error login:", error);
-        res.status(500).json({ message: "Kesalahan server" });
+    if (user.password !== password) {
+      return res.status(401).json({ message: "Password salah" });
     }
+
+    const token = jwt.sign(
+      { id: user.id, username: user.username },
+      SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({
+      message: "Login berhasil",
+      token,
+      username: user.username,
+      namaLengkapUser: user.namaLengkapUser
+    });
+
+  } catch (error) {
+    console.error("❌ Error login:", error);
+    res.status(500).json({ message: "Kesalahan server" });
+  }
 };
+
+
+
 
 export const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];

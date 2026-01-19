@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { NavbarComponent } from "./components/NavbarComponent";
 import Footer from "./components/footer";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
 const AdminProfile = () => {
   const [adminInfo, setAdminInfo] = useState(null);
@@ -19,7 +21,7 @@ const AdminProfile = () => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    fetch("http://localhost:5000/api/admin/profile", {
+    fetch(`${API_BASE}/api/admin/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -38,7 +40,7 @@ const AdminProfile = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/admin/reset-password", {
+      const res = await fetch(`${API_BASE}/api/admin/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: adminInfo.username, newPassword }),

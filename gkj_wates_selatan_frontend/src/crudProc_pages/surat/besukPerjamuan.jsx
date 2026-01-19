@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavbarComponent } from "../../components/NavbarComponent";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 const BesukPerjamuan = () => {
   const navigate = useNavigate();
 
@@ -115,7 +117,7 @@ const BesukPerjamuan = () => {
     let isSavedSuccessfully = false;
 
     try {
-      const response = await fetch("http://localhost:5000/api/surat", {
+      const response = await fetch(`${API_BASE}/api/surat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payloadToBackend),

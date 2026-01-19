@@ -5,6 +5,8 @@ import { faArrowLeft, faSave } from "@fortawesome/free-solid-svg-icons";
 import { NavbarComponent } from "../components/NavbarComponent";
 import Footer from "../components/footer";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
 const EditJemaat = () => {
   const navigate = useNavigate();
@@ -137,7 +139,7 @@ const EditJemaat = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/jemaat/${kodeJemaat}`, {
+      const res = await fetch(`${API_BASE}/api/jemaat/${kodeJemaat}`, {
         method: "PUT",
         body: fd,
       });

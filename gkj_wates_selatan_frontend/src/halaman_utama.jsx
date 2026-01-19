@@ -86,7 +86,7 @@ const JumbotronSection = () => (
       {/* Menggunakan kelas flex-column di mobile (d-flex flex-column) dan gap-2, lalu kembali ke flex-row di tablet ke atas (flex-md-row gap-md-3) */}
       <div className="d-flex flex-column flex-sm-row justify-content-center gap-1 gap-sm-2"> 
         {/* Tombol DAFTAR: Hapus w-100 di button, biarkan w-100 w-sm-auto di Link */}
-        <Link to="/daftar" style={{ color: "white", textDecoration: "none" }} className=" w-sm-auto">
+        {/* <Link to="/daftar" style={{ color: "white", textDecoration: "none" }} className=" w-sm-auto">
             <button 
                 type="button" 
                 // Ubah class tombol: Hapus w-100 agar di desktop lebarnya sesuai konten
@@ -95,7 +95,9 @@ const JumbotronSection = () => (
             >
                 DAFTAR
             </button>
-        </Link>
+        </Link> */}
+
+
         
         {/* Tombol MASUK: Hapus w-100 di button, biarkan w-100 w-sm-auto di Link */}
         <Link to="/login" style={{ color: "white", textDecoration: "none" }} className=" w-sm-auto">

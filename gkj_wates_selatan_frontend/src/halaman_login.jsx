@@ -5,6 +5,7 @@ import logoGKJ from './assets/logoGKJ.png';
 import backgroundimg2 from './assets/gkjwatesselatan2.png';
 import { NavbarComponentLogin } from './components/NavbarComponent';
 import Footer from "./components/footer";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 
 const LoginForm = () => {
@@ -22,29 +23,33 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Login biasa
   const handleLogin = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
+  try {
+    const res = await fetch(`${API_BASE}/api/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username, password })
+    });
 
-      if (!res.ok) {
-        alert(data.message);
-        return;
-      }
+    const data = await res.json();
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.username);
-      localStorage.setItem("namaLengkapUser", data.namaLengkapUser);
-
-      navigate("/data");
-    } catch (err) {
-      console.error(err);
-      alert("Terjadi kesalahan server");
+    if (!res.ok) {
+      alert(data.message);
+      return;
     }
-  };
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("username", data.username);
+    localStorage.setItem("namaLengkapUser", data.namaLengkapUser);
+
+    navigate("/data");
+  } catch (err) {
+    console.error("❌ Login error:", err);
+    alert("Terjadi kesalahan server");
+  }
+};
+
 
   // Ganti password
   const handleResetPassword = async () => {
@@ -59,7 +64,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/admin/reset-password", {
+      const res = await fetch(`${API_BASE}/api/admin/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, newPassword })
@@ -252,8 +257,9 @@ const HalamanLogin = () => {
               zIndex: 1,
             }}
           />
+    
           <div className="position-relative text-center" style={{ zIndex: 2 }}>
-            <Link to="/daftar" style={{ color: "white", textDecoration: "none" }}>
+            {/* <Link to="/daftar" style={{ color: "white", textDecoration: "none" }}>
               <button className="btn btn-info btn-lg fw-bold shadow-lg mb-4"
                 style={{
                   backgroundColor: '#004d99',
@@ -268,9 +274,9 @@ const HalamanLogin = () => {
             </Link>
             <p className="lead mb-5" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.7)' }}>
               Saya belum memiliki akun, saya akan <Link to="/daftar" className="text-white text-decoration-underline fw-bold">DAFTAR</Link>
-            </p>
+            </p> */}
             <Link to="/" style={{ color: "white", textDecoration: "none" }}>
-              <span className="text-white mt-5 d-block text-decoration-none" style={{ fontSize: '1.1rem', textShadow: '1px 1px 2px rgba(0,0,0,0.7)' }}>
+              <span className="text-white mt-5 d-block text-decoration-none" style={{ fontSize: '1.3rem', textShadow: '1px 1px 2px rgba(0,0,0,0.7)' }}>
                 &larr; Kembali ke halaman awal
               </span>
             </Link>

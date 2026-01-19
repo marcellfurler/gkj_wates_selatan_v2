@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Footer from "./components/footer";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
 const HalamanStatistik = () => {
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ const HalamanStatistik = () => {
   // ===== Fetch list tahun =====
   const fetchListTahun = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/statistik/tahun");
+      const res = await fetch(`${API_BASE}/api/statistik/tahun`);
       const data = await res.json(); // data = [2025, 2024, 2023, ...]
       setListTahun(data);
     } catch (err) {
@@ -57,7 +59,7 @@ const HalamanStatistik = () => {
   // ===== Fetch functions dengan parameter tahun =====
   const fetchTotalJemaat = async (tahun) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/statistik/total?tahun=${tahun}`);
+      const res = await fetch(`${API_BASE}/api/statistik/total?tahun=${tahun}`);
       const data = await res.json();
       setTotalJemaat(data.total || 0);
     } catch (err) {
@@ -67,7 +69,7 @@ const HalamanStatistik = () => {
 
   const fetchPepanthanData = async (tahun) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/statistik/pepanthan?tahun=${tahun}`);
+      const res = await fetch(`${API_BASE}/api/statistik/pepanthan?tahun=${tahun}`);
       const data = await res.json();
 
       const warna = ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#004d97"];
@@ -87,7 +89,7 @@ const HalamanStatistik = () => {
 
   const fetchPepanthanUsia = async (tahun) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/statistik/pepanthan-usia?tahun=${tahun}`);
+      const res = await fetch(`${API_BASE}/api/statistik/pepanthan-usia?tahun=${tahun}`);
       const data = await res.json();
 
       const warna = ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f"];
@@ -106,7 +108,7 @@ const HalamanStatistik = () => {
 
   const fetchGenderData = async (tahun) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/statistik/jenisKelamin?tahun=${tahun}`);
+      const res = await fetch(`${API_BASE}/api/statistik/jenisKelamin?tahun=${tahun}`);
       const data = await res.json();
       setGenderData(data);
     } catch (err) {
@@ -116,7 +118,7 @@ const HalamanStatistik = () => {
 
   const fetchNikahData = async (tahun) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/statistik/nikah?tahun=${tahun}`);
+      const res = await fetch(`${API_BASE}/api/statistik/nikah?tahun=${tahun}`);
       const data = await res.json();
       setNikahData(data);
     } catch (err) {
@@ -126,7 +128,7 @@ const HalamanStatistik = () => {
 
   const fetchBaptisData = async (tahun) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/statistik/baptis?tahun=${tahun}`);
+      const res = await fetch(`${API_BASE}/api/statistik/baptis?tahun=${tahun}`);
       const data = await res.json();
       setBaptisData(data);
     } catch (err) {
@@ -136,7 +138,7 @@ const HalamanStatistik = () => {
 
   const fetchSidiData = async (tahun) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/statistik/sidi?tahun=${tahun}`);
+      const res = await fetch(`${API_BASE}/api/statistik/sidi?tahun=${tahun}`);
       const data = await res.json();
       setSidiData(data);
     } catch (err) {
@@ -146,7 +148,7 @@ const HalamanStatistik = () => {
 
   const fetchMeninggalData = async (tahun) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/statistik/meninggal?tahun=${tahun}`);
+      const res = await fetch(`${API_BASE}/api/statistik/meninggal?tahun=${tahun}`);
       const data = await res.json();
       setMeninggalData(data);
     } catch (err) {
