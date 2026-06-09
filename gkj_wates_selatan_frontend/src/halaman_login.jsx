@@ -7,7 +7,7 @@ import { NavbarComponentLogin } from './components/NavbarComponent';
 import Footer from "./components/footer";
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-console.log("API_BASE =", API_BASE);
+console.log("API_BASE =", import.meta.env.VITE_API_BASE_URL);
 
 
 const LoginForm = () => {
