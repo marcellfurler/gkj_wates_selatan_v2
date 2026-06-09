@@ -1,21 +1,21 @@
-#FROM nginx:alpine
+FROM node:20-alpine AS builder
 
-#RUN rm -rf /usr/share/nginx/html/*
-#COPY dist /usr/share/nginx/html
+WORKDIR /app
 
-#EXPOSE 80
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
 
 FROM nginx:alpine
 
-# hapus config default nginx
-RUN rm /etc/nginx/conf.d/default.conf
-
-# copy config SPA
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# copy hasil build react
-RUN rm -rf /usr/share/nginx/html/*
-COPY dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 
+CMD ["nginx", "-g", "daemon off;"]
