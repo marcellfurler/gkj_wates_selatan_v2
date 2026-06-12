@@ -31,7 +31,7 @@ app.use(cors({
     if (!origin) return callback(null, true);
 
     const allowedOrigins = [
-      "http://192.168.100.72:3000",
+      "http://192.168.100.101:5000",
       "https://jimm.labjaringanukdw.my.id"
     ];
 
